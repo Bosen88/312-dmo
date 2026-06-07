@@ -90,6 +90,11 @@ nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-w
 .orr{position:absolute;border-radius:50%;border:1px solid;animation:spin var(--spd,8s) linear infinite;pointer-events:none}
 @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
 @keyframes glowP{0%,100%{opacity:.3}50%{opacity:.7}}
+@keyframes framePulse{0%,100%{opacity:.6}50%{opacity:1}}
+@keyframes frameSparkle{0%,100%{opacity:.8;transform:scale(1)}50%{opacity:1;transform:scale(1.005)}}
+@keyframes zoomIn{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes bncY{from{transform:translateY(0)}to{transform:translateY(-12px)}}
+.car{border-radius:50%;display:flex;align-items:center;justify-content:center;animation:bncY .6s ease infinite alternate}
 @keyframes beam{0%,100%{opacity:0;height:0}50%{opacity:.8;height:100px}}
 @keyframes pf{0%{transform:translate(var(--sx),var(--sy)) scale(0);opacity:0}20%{opacity:1}80%{opacity:.5}100%{transform:translate(var(--ex),var(--ey)) scale(0);opacity:0}}
 .lvb{position:absolute;bottom:-5px;right:-5px;font-family:var(--orb);font-size:.6rem;font-weight:700;padding:3px 8px;border-radius:20px;z-index:10;white-space:nowrap}
@@ -229,6 +234,27 @@ nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-w
 <body>
 <div id="loading"><div class="ll">3·1·2</div><div style="font-size:.7rem;color:var(--muted2);letter-spacing:2px;margin-top:-6px">DMO 英雄養成</div><div class="lb"><div class="lf"></div></div></div>
 <div id="toast"></div>
+<!-- GENDER SELECT -->
+<div class="screen" id="gs-screen">
+  <div style="width:100%;max-width:480px;padding:40px 24px;min-height:100dvh;display:flex;flex-direction:column;justify-content:center">
+    <div style="font-family:var(--orb);font-size:1.4rem;color:var(--gold);text-align:center;margin-bottom:8px;text-shadow:0 0 20px rgba(245,200,66,.4)">選擇角色性別</div>
+    <div style="font-size:.82rem;color:var(--muted2);text-align:center;margin-bottom:40px" id="gs-sub">選擇後將影響角色外觀立繪</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:32px">
+      <div id="gs-female" onclick="pickGender('female')" style="background:linear-gradient(135deg,var(--bg2),var(--bg1));border:2px solid var(--border);border-radius:20px;padding:28px 20px;text-align:center;cursor:pointer;transition:all .3s">
+        <span style="font-size:3rem;margin-bottom:12px;display:block">👩</span>
+        <div style="font-family:var(--orb);font-size:1rem;color:var(--purple2);margin-bottom:4px">女性</div>
+        <div style="font-size:.72rem;color:var(--muted2)">女性角色外觀</div>
+      </div>
+      <div id="gs-male" onclick="pickGender('male')" style="background:linear-gradient(135deg,var(--bg2),var(--bg1));border:2px solid var(--border);border-radius:20px;padding:28px 20px;text-align:center;cursor:pointer;transition:all .3s">
+        <span style="font-size:3rem;margin-bottom:12px;display:block">👨</span>
+        <div style="font-family:var(--orb);font-size:1rem;color:var(--blue);margin-bottom:4px">男性</div>
+        <div style="font-size:.72rem;color:var(--muted2)">男性角色外觀</div>
+      </div>
+    </div>
+    <button class="btn btn-gold" style="padding:15px;font-size:1rem" onclick="confirmGender()">確認，開始冒險 →</button>
+  </div>
+</div>
+
 <!-- QUIZ -->
 <div class="screen" id="quiz-screen">
   <div class="qw">
@@ -250,15 +276,19 @@ nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-w
   </div>
 </div>
 <!-- LEVEL UP -->
-<div class="screen" id="lu-screen">
-  <div class="luw">
-    <div class="lufw" id="lu-fw"></div>
-    <div style="font-size:2.5rem;margin-bottom:16px;animation:zoomIn .5s ease">✨⭐✨</div>
-    <div class="lut">LEVEL UP!</div>
-    <div style="font-size:.9rem;color:var(--muted2);margin-bottom:4px" id="lu-sub"></div>
-    <div class="luc" id="lu-char"></div>
-    <div style="font-family:var(--orb);font-size:1rem;color:var(--purple2);margin-bottom:8px" id="lu-title"></div>
-    <div style="font-size:.82rem;color:var(--muted2);font-style:italic;margin-bottom:28px;line-height:1.6;padding:0 16px" id="lu-quote"></div>
+<div class="screen" id="lu-screen" style="justify-content:center">
+  <div style="width:100%;max-width:480px;text-align:center;padding:20px 24px;position:relative;display:flex;flex-direction:column;align-items:center">
+    <div style="position:absolute;inset:0;pointer-events:none;overflow:hidden" id="lu-fw"></div>
+    <div style="font-size:2rem;margin-bottom:10px;animation:zoomIn .5s ease">✨⭐✨</div>
+    <div style="font-family:var(--orb);font-size:2rem;background:linear-gradient(135deg,var(--gold),var(--gold2),var(--purple2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:4px;letter-spacing:2px">LEVEL UP!</div>
+    <div style="font-size:.9rem;color:var(--muted2);margin-bottom:2px" id="lu-sub"></div>
+    <div style="font-family:var(--orb);font-size:.8rem;color:var(--purple2);margin-bottom:14px" id="lu-stage-name"></div>
+    <div style="position:relative;width:180px;margin:0 auto 16px" id="lu-portrait-wrap">
+      <img id="lu-portrait" style="width:180px;height:240px;object-fit:cover;object-position:center top;border-radius:16px;display:block" src="" alt="">
+      <div id="lu-frame" style="position:absolute;inset:0;border-radius:16px;border:2px solid var(--gold);animation:framePulse 1s ease-in-out infinite;pointer-events:none"></div>
+    </div>
+    <div style="font-family:var(--orb);font-size:.95rem;color:var(--gold);margin-bottom:6px" id="lu-title"></div>
+    <div style="font-size:.78rem;color:var(--muted2);font-style:italic;margin-bottom:20px;line-height:1.6;padding:0 16px" id="lu-quote"></div>
     <button class="btn btn-gold" style="padding:15px;font-size:1rem" onclick="closeLU()">繼續冒險 →</button>
   </div>
 </div>
@@ -269,7 +299,7 @@ nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-w
     <div class="page active" id="page-home">
       <div class="hs">
         <div class="ht">
-          <div id="home-av" style="position:relative;width:88px;height:88px;flex-shrink:0"></div>
+          <div id="home-av" style="width:110px;flex-shrink:0"></div>
           <div class="hi">
             <div class="hn" id="h-name"></div>
             <div class="htt" id="h-title"></div>
@@ -315,7 +345,7 @@ nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-w
         <div style="padding-top:8px;margin-bottom:16px;font-family:var(--orb);font-size:1.4rem;background:linear-gradient(135deg,var(--gold),var(--purple2));-webkit-background-clip:text;-webkit-text-fill-color:transparent">成長記錄</div>
         <div class="card" style="margin-bottom:16px">
           <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
-            <div id="stats-av" style="position:relative;width:50px;height:50px;flex-shrink:0"></div>
+            <div id="stats-av" style="width:60px;height:80px;border-radius:10px;overflow:hidden;flex-shrink:0"></div>
             <div style="flex:1"><div style="font-family:var(--orb);font-size:.9rem;color:var(--gold)" id="sc-name"></div><div style="font-size:.68rem;color:var(--muted2);margin-top:2px" id="sc-sub"></div></div>
             <div style="text-align:right"><div style="font-family:var(--orb);font-size:1.4rem;color:var(--gold)" id="sc-lv"></div><div style="font-size:.6rem;color:var(--muted2)">等級</div></div>
           </div>
@@ -367,6 +397,7 @@ nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-w
         <div class="setr" onclick="openChangeName()"><div class="seti" id="sr-icon">🌟</div><div class="setii"><div class="setn" id="sr-name">—</div><div class="sets" id="sr-sub">點擊修改名稱</div></div><div style="color:var(--muted);font-size:.8rem">›</div></div>
         <div class="setr" onclick="openChangePass('user')"><div class="seti">🔒</div><div class="setii"><div class="setn">修改密碼</div><div class="sets">更換登入密碼</div></div><div style="color:var(--muted);font-size:.8rem">›</div></div>
         <div class="setr" onclick="reQuiz()"><div class="seti">🎮</div><div class="setii"><div class="setn">重新測驗人格</div><div class="sets">換一個角色類型</div></div><div style="color:var(--muted);font-size:.8rem">›</div></div>
+        <div class="setr" onclick="reGender()"><div class="seti">👤</div><div class="setii"><div class="setn">更換角色性別</div><div class="sets">切換男性/女性立繪</div></div><div style="color:var(--muted);font-size:.8rem">›</div></div>
         <div class="lbl" style="margin-top:4px">帳號操作</div>
         <div class="setr" onclick="exportData()"><div class="seti">📤</div><div class="setii"><div class="setn">匯出我的記錄</div><div class="sets">下載 JSON 備份</div></div><div style="color:var(--muted);font-size:.8rem">›</div></div>
         <div class="setr" onclick="doLogout()"><div class="seti">🚪</div><div class="setii"><div class="setn">登出</div><div class="sets">返回登入頁面</div></div><div style="color:var(--muted);font-size:.8rem">›</div></div>
@@ -476,6 +507,102 @@ const QS=[
 ];
 const TMPLS={3:['加新朋友','主動聊天','發限動互動','IG/FB留言','介紹產品','陌生開發','推薦SHOP.COM'],1:['一對一約談','線上講計畫','帶人參會','分享簡報','發有價值內容','Zoom邀約','直播分享'],2:['關心使用狀況','回答問題','會後跟進','推進決定','確認加入意願','溫暖問候','寄資料']};
 const MS=[{icon:'🌟',label:'第一天達標',chk:(s,l,cd)=>cd>=1},{icon:'🔥',label:'7天連勝',chk:s=>s>=7},{icon:'💫',label:'14天連勝',chk:s=>s>=14},{icon:'👑',label:'30天連勝',chk:s=>s>=30},{icon:'⚡',label:'Lv.5達成',chk:(_,l)=>l>=5},{icon:'💎',label:'Lv.10達成',chk:(_,l)=>l>=10},{icon:'🏆',label:'Lv.15達成',chk:(_,l)=>l>=15},{icon:'🌌',label:'傳說 Lv.20',chk:(_,l)=>l>=20}];
+
+// ============================================================
+// IMAGE MAP — 40 character portraits (Higgsfield Recraft 4.1)
+// ============================================================
+const HF_BASE = 'https://d8j0ntlcm91z4.cloudfront.net/user_3CG88mzhh71CKdo7YAhe9KY57OM/';
+const CHAR_IMGS = {
+  resonator_female: ['41a2963c-e3df-4bc1-a12b-84a0142b8b11','a8a2b8f4-619e-4671-9610-81b5f6bd6dda','512830ad-3641-4fc1-a8e3-9cab3d03226c','40e92022-920f-4a49-b47d-659ea2186062','7723620d-0240-4a4f-b269-ef7102a21329'],
+  resonator_male:   ['b52acdd3-ffe5-49d0-9e9d-3154efe406f5','79e94693-e3d8-4eb0-801e-10cd17006697','52ffb9e6-0442-4477-805a-62217f6b7945','d2e54e75-deb9-4ad4-bffb-817bcb875718','c860ab46-fcd9-4edb-9e12-ec83f56be5d0'],
+  commander_female: ['ea138a67-21a9-4bd3-ace4-d402fca3f6f7','07a716be-c8a3-4965-b9a8-087b9a4c1b79','e8211791-b4d4-4fc9-84c5-a2ad1a73d656','0c9089c6-01a4-4711-abab-27f993e01650','d4de0ccc-e0b0-426f-84d8-78545f0acba3'],
+  commander_male:   ['a2845171-4e2f-4ed3-a3f4-a4ea2cbe7960','f72b14f5-2dee-462c-9d59-485b67b11e79','3b172d62-7b70-460a-bcfe-2f8b21d9b415','96365eb4-ca58-424b-870a-f7b55f944309','322f64c9-d120-4a7a-af37-044efcc13aae'],
+  analyst_female:   ['e420720d-9040-4087-bcb5-7cc7b53d0971','033add50-060b-4a5a-89b5-3259b03eb8fc','00581641-583c-46c2-9e13-6f4bbc396605','a557ea4a-91fb-4f54-a251-55d1350cb3c8','333614cb-c21f-4ebd-b2e2-a1146adae4e4'],
+  analyst_male:     ['a9e23c34-57ff-45b9-9477-8e5ce6270667','3dd50f19-a584-43a9-acca-30bb1926d1e8','c6e698bc-239c-43c1-9b4d-f3ac4c3fdd58','fb2aa284-a36a-491f-be8a-1d726a3caac4','7f67543b-0cb1-4d97-b013-9647f9ed5acf'],
+  connector_female: ['f38b08d0-70d0-491a-9183-c70acc3a0c45','535819b2-d2a2-463e-a23a-0cd5505add2c','2bd53720-5a55-4385-9ea9-07a57a80a739','40aef733-52fa-490a-a4f1-855d883727e5','1d212ff9-ff20-4d08-aa3c-07899b3213f0'],
+  connector_male:   ['319993f8-918e-4e96-bac3-0265ca7f532a','4d17e2ba-cc0d-44ec-b9e6-2d1d3b52db3b','4da81486-aef8-44ba-90a1-cd9942967d88','1ba75dfe-f4b1-4b76-a2ff-176723c2af0e','a8601e6d-f459-4807-b62a-10c85481283b']
+};
+const STAGE_LABELS_ARR = ['種子期','覺醒期','強化期','菁英期','傳說期'];
+function getStage(lv){if(lv<=4)return 0;if(lv<=8)return 1;if(lv<=12)return 2;if(lv<=16)return 3;return 4;}
+function getImgUrl(charId, gender, stage){
+  const key = `${charId}_${gender||'female'}`;
+  const ids = CHAR_IMGS[key];
+  if(!ids) return '';
+  const id = ids[Math.min(stage,4)];
+  return `${HF_BASE}hf_20260525_${id}.png`;
+}
+function buildPortrait(containerId, charId, gender, lv, opts={}){
+  const el=document.getElementById(containerId); if(!el) return;
+  const stage=getStage(lv);
+  const ch=CHARS[charId]||CHARS.resonator;
+  const imgUrl=getImgUrl(charId, gender||'female', stage);
+  const w=opts.width||110, h=opts.height||Math.round(w*4/3);
+  const glow=[0,'rgba(255,255,255,.2)','rgba(245,200,66,.5)',ch.color,ch.color][stage];
+  const shadow=stage===0?'0 4px 20px rgba(0,0,0,.4)':
+    stage===1?`0 0 20px ${ch.color}55`:
+    stage===2?`0 0 30px ${ch.color}77,0 0 60px ${ch.color}33`:
+    stage===3?`0 0 40px ${ch.color}99,0 0 80px ${ch.color}44`:
+              `0 0 50px ${ch.color},0 0 100px ${ch.color}66,0 0 150px ${ch.color}33`;
+  const frameAnim=stage>=2?`animation:framePulse ${stage>=4?'1s':'1.5s'} ease-in-out infinite`:'';
+  el.innerHTML=`<div style="position:relative;width:${w}px;height:${h}px;border-radius:14px;overflow:hidden;box-shadow:${shadow}">
+    <img src="${imgUrl}" style="width:${w}px;height:${h}px;object-fit:cover;object-position:center top;border-radius:14px;display:block" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+    <div style="display:none;width:${w}px;height:${h}px;align-items:center;justify-content:center;font-size:${Math.round(w*.35)}px;background:${ch.colorDim};border-radius:14px">${ch.emoji}</div>
+    ${stage>=1?`<div style="position:absolute;inset:0;border-radius:14px;border:2px solid ${glow};${frameAnim};pointer-events:none"></div>`:''}
+    <div style="position:absolute;bottom:6px;left:50%;transform:translateX(-50%);font-family:var(--orb);font-size:.5rem;font-weight:700;padding:2px 8px;border-radius:20px;background:linear-gradient(135deg,${ch.color}cc,${ch.color}88);color:#fff;border:1px solid ${ch.color}60;white-space:nowrap;backdrop-filter:blur(8px)">${STAGE_LABELS_ARR[stage]}</div>
+  </div>`;
+}
+// GENDER SELECT
+let _tempGender = null;
+function showGenderSelect(){
+  _tempGender = CU.gender||null;
+  updateGenderUI(_tempGender);
+  const ch=CHARS[CU.charId||'resonator'];
+  document.getElementById('gs-sub').textContent=`角色：${ch.name}，選擇立繪性別`;
+  showScreen('gs-screen');
+}
+function updateGenderUI(g){
+  ['female','male'].forEach(s=>{
+    const el=document.getElementById('gs-'+s);
+    if(!el) return;
+    if(g===s){el.style.borderColor='var(--gold)';el.style.background='var(--gold-dim)';}
+    else{el.style.borderColor='var(--border)';el.style.background='linear-gradient(135deg,var(--bg2),var(--bg1))';}
+  });
+}
+function pickGender(g){_tempGender=g;updateGenderUI(g);snd('click');}
+async function confirmGender(){
+  if(!_tempGender){toast('請先選擇性別','tr');return;}
+  CU.gender=_tempGender;
+  await saveUser();
+  hideAllScreens();
+  renderHome(); goPage('home');
+  toast('角色立繪已更新！','tp');
+}
+function reGender(){showGenderSelect();}
+
+
+// ============================================================
+// MIDNIGHT AUTO-COMPLETE — 每天 24:00 自動結算
+// ============================================================
+function setMidnightTimer(){
+  const now=new Date(),midnight=new Date(now);
+  midnight.setHours(24,0,0,0);
+  const ms=midnight-now;
+  setTimeout(()=>{autoCompleteDay();setInterval(autoCompleteDay,24*60*60*1000);},ms);
+}
+function autoCompleteDay(){
+  if(!CU)return;
+  const today=dk();
+  const d=CU.days&&CU.days[today];
+  if(!d)return;
+  const ac=d.actions||[];
+  const d3=ac.filter(a=>a.type===3).length>=3;
+  const d1=ac.filter(a=>a.type===1).length>=1;
+  const d2=ac.filter(a=>a.type===2).length>=2;
+  if(d3&&d1&&d2&&!d.completed){
+    d.completed=true;addTL('🎯','今日 3-1-2 全部達標！');saveUser();
+  }
+}
+
 let CU=null,IS_ADMIN=false,ADMIN_UN='',qS={},qStep=0,recC=null,selC=null,addType=3,editAid=null,cfCb=null,passTarget='user',adminAT='ALL';
 window.addEventListener('fbReady',async()=>{
   const p=new URLSearchParams(location.search);
@@ -501,7 +628,10 @@ async function loadUser(un,isNew=false){
   document.getElementById('app').style.display='flex';
   document.getElementById('user-nav').style.display='flex';
   document.getElementById('admin-nav').style.display='none';
+  // midnight auto-complete setup
+  setMidnightTimer();
   if(!CU.charId||isNew){startQuiz();}
+  else if(!CU.gender){showGenderSelect();}
   else{renderHome();goPage('home');toast(isNew?`歡迎！${CU.name}，開始你的英雄之旅 🎉`:`歡迎回來，${CU.name}！`,'to');}
 }
 /* QUIZ */
@@ -511,7 +641,7 @@ function ansQ(i){const s=QS[qStep].opts[i].s;Object.keys(s).forEach(k=>qS[k]+=s[
 function finishQ(){recC=Object.keys(qS).sort((a,b)=>qS[b]-qS[a])[0];selC=recC;hideAllScreens();showScreen('cs-screen');renderCharCards();const c=CHARS[recC];document.getElementById('cs-title').textContent=`你是「${c.name}型」！`;document.getElementById('cs-sub').textContent=`根據你的答案推薦 ${c.name}，也可以選擇其他角色`;}
 function renderCharCards(){document.getElementById('char-cards').innerHTML=Object.values(CHARS).map(c=>{const isR=c.id===recC,isS=c.id===selC;return`<div class="csc" onclick="pickChar('${c.id}')" style="border-color:${isS?c.color:'rgba(255,255,255,.08)'};background:${isS?`linear-gradient(135deg,${c.colorDim},var(--bg1))`:''}">${isR?'<div style="position:absolute;top:12px;right:12px;font-size:.6rem;padding:3px 10px;border-radius:20px;font-weight:700;background:linear-gradient(135deg,var(--gold),var(--gold2));color:#080812">✨ 推薦</div>':''}<div style="display:flex;align-items:center;gap:14px;margin-bottom:10px"><div style="font-size:2.6rem;color:${c.color};filter:drop-shadow(0 0 12px ${c.color})">${c.emoji}</div><div><div style="font-family:var(--orb);font-size:1rem;color:${c.color};margin-bottom:4px">${c.name}</div><div style="font-family:var(--mono);font-size:.66rem;color:var(--muted2)">${c.mbti.join(' · ')}</div></div></div><div style="font-size:.8rem;color:var(--muted2);line-height:1.6;margin-bottom:10px">${c.desc}</div><div style="display:flex;flex-wrap:wrap;gap:6px">${c.traits.map(t=>`<span style="font-size:.63rem;padding:3px 10px;border-radius:20px;border:1px solid ${c.color}50;background:${c.colorDim};color:${c.color}">${t}</span>`).join('')}</div></div>`;}).join('');}
 function pickChar(id){selC=id;snd('click');renderCharCards();}
-async function confirmChar(){if(!selC)return;CU.charId=selC;await saveUser();hideAllScreens();renderHome();goPage('home');toast('角色選定！開始你的英雄旅程 ✨','to');}
+async function confirmChar(){if(!selC)return;CU.charId=selC;await saveUser();hideAllScreens();showGenderSelect();}
 /* AVATAR */
 function getStage(lv){if(lv<=4)return 0;if(lv<=8)return 1;if(lv<=12)return 2;if(lv<=16)return 3;return 4;}
 function buildAvatar(cid,charId,lv,small=false){
@@ -536,7 +666,7 @@ function renderHome(){
   const xpN=LEVELS[Math.min(lv,LEVELS.length-1)],xpP=lv>1?LEVELS[lv-1]:0;
   const pct=xpN>xpP?Math.min(100,Math.round((xp-xpP)/(xpN-xpP)*100)):100;
   const stage=getStage(lv),ti=Math.min(Math.floor((lv-1)/4),ch.levelTitles.length-1);
-  buildAvatar('home-av',CU.charId,lv);
+  buildPortrait('home-av',CU.charId,CU.gender,lv,{width:110});
   document.getElementById('h-name').textContent=`${CU.name}  ${ch.name}`;
   document.getElementById('h-title').textContent=`${ch.levelTitles[ti]} · ${SN[stage]}`;
   document.getElementById('h-quote').textContent=ch.quotes[Math.floor(Math.random()*ch.quotes.length)];
@@ -556,7 +686,7 @@ function dobj(){if(!CU.days)CU.days={};const k=dk();if(!CU.days[k])CU.days[k]={a
 function renderToday(){
   const today=dobj(),ac=today.actions||[];
   const a3=ac.filter(a=>a.type===3),a1=ac.filter(a=>a.type===1),a2=ac.filter(a=>a.type===2);
-  const d3=a3.filter(a=>a.done).length,d1=a1.filter(a=>a.done).length,d2=a2.filter(a=>a.done).length;
+  const d3=a3.length,d1=a1.length,d2=a2.length;
   setF('3',d3,3);setF('1',d1,1);setF('2',d2,2);
   document.getElementById('ac3').textContent=`${d3}/3`;document.getElementById('ac1').textContent=`${d1}/1`;document.getElementById('ac2').textContent=`${d2}/2`;
   rg('items3',a3);rg('items1',a1);rg('items2',a2);
@@ -564,28 +694,70 @@ function renderToday(){
   chkCmp(d3,d1,d2);
 }
 function setF(id,done,total){const el=document.getElementById('fi-'+id);document.getElementById('fp-'+id).textContent=`${done}/${total}`;el.classList.remove('done','partial');if(done>=total)el.classList.add('done');else if(done>0)el.classList.add('partial');}
-function rg(cid,actions){document.getElementById(cid).innerHTML=actions.map(a=>`<div class="ai ${a.done?'done':''}" onclick="togAct('${a.id}')"><div class="ach">${a.done?'✓':''}</div><div class="ab"><div class="an">${esc(a.name||'—')}</div>${a.note?`<div class="ano">${esc(a.note)}</div>`:''}</div><div class="axp">+${XPP[a.type]}XP</div><button class="aed" onclick="openEditAct(event,'${a.id}')">編輯</button></div>`).join('');}
+function rg(cid,actions){document.getElementById(cid).innerHTML=actions.map(a=>`<div class="ai done"><div class="ach">✓</div><div class="ab"><div class="an">${esc(a.name||'—')}</div>${a.note?`<div class="ano">${esc(a.note)}</div>`:''}</div><div class="axp">+${XPP[a.type]}XP</div><button class="aed" onclick="openEditAct(event,'${a.id}')">編輯</button></div>`).join('');}
 async function togAct(id){const today=dobj(),a=today.actions.find(x=>x.id===id);if(!a)return;a.done=!a.done;if(a.done){CU.xp=(CU.xp||0)+XPP[a.type];snd('check');chkLvUp();}else CU.xp=Math.max(0,(CU.xp||0)-XPP[a.type]);await saveUser();renderHome();}
 async function chkCmp(d3,d1,d2){const today=dobj(),was=today.completed;today.completed=d3>=3&&d1>=1&&d2>=2;if(!was&&today.completed){await saveUser();setTimeout(()=>toast('🎉 今日 3-1-2 全部達標！','to'),400);snd('complete');addTL('🎯','今日 3-1-2 全部達標！');}else await saveUser();}
 async function chkLvUp(){const lv=CU.level||1,xp=CU.xp||0;if(xp>=LEVELS[Math.min(lv,LEVELS.length-1)]&&lv<20){CU.level=lv+1;await saveUser();showLU(lv+1);addTL('⭐',`升級到 Lv.${lv+1}！`);}}
 function addTL(icon,text){if(!CU.timeline)CU.timeline=[];CU.timeline.push({icon,text,date:dk(),ts:Date.now()});CU.timeline=CU.timeline.slice(-50);}
 function streak(){let s=0;const d=new Date();for(let i=0;i<365;i++){const k=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;if(CU.days&&CU.days[k]&&CU.days[k].completed)s++;else if(i>0)break;d.setDate(d.getDate()-1);}return s;}
-function showLU(lv){const ch=CHARS[CU.charId]||CHARS.resonator,ti=Math.min(Math.floor((lv-1)/4),ch.levelTitles.length-1),qi=Math.min(Math.floor((lv-1)/4),ch.levelQuotes.length-1);document.getElementById('lu-sub').textContent=`恭喜升到 Lv.${lv}！`;document.getElementById('lu-char').textContent=ch.emoji;document.getElementById('lu-title').textContent=`✦ ${ch.levelTitles[ti]} ✦`;document.getElementById('lu-quote').textContent=ch.levelQuotes[qi];const fw=document.getElementById('lu-fw');fw.innerHTML='';for(let i=0;i<30;i++){const sp=document.createElement('div');sp.className='lusk';const a=Math.random()*360,dist=80+Math.random()*120,tx=Math.cos(a*Math.PI/180)*dist,ty=Math.sin(a*Math.PI/180)*dist;const cols=[ch.color,'#fff','#ffd700','#ff69b4','#00ff88'];sp.style.cssText=`background:${cols[Math.floor(Math.random()*cols.length)]};left:50%;top:40%;--tx:${tx}px;--ty:${ty}px;--dur:${.5+Math.random()*.8}s;--del:${Math.random()*.5}s;width:${3+Math.random()*4}px;height:${3+Math.random()*4}px`;fw.appendChild(sp);}showScreen('lu-screen');snd('levelup');}
+function showLU(lv){
+  const ch=CHARS[CU.charId]||CHARS.resonator;
+  const stage=getStage(lv);
+  const ti=Math.min(Math.floor((lv-1)/4),ch.levelTitles.length-1);
+  const qi=Math.min(Math.floor((lv-1)/4),ch.levelQuotes.length-1);
+  const isNewStage=lv===5||lv===9||lv===13||lv===17;
+  const imgUrl=getImgUrl(CU.charId,CU.gender||'female',stage);
+  document.getElementById('lu-sub').textContent=`恭喜升到 Lv.${lv}！`;
+  const sn=document.getElementById('lu-stage-name');
+  if(sn)sn.textContent=isNewStage?`🎉 進入${STAGE_LABELS_ARR[stage]}！`:STAGE_LABELS_ARR[stage];
+  const lp=document.getElementById('lu-portrait');
+  if(lp){lp.src=imgUrl;lp.style.cssText=`width:180px;height:240px;object-fit:cover;object-position:center top;border-radius:16px;box-shadow:0 0 60px ${ch.color},0 0 120px ${ch.color}66`;}
+  const lf=document.getElementById('lu-frame');
+  if(lf)lf.style.cssText=`position:absolute;inset:0;border-radius:16px;border:2px solid ${ch.color};animation:framePulse 1s ease-in-out infinite;pointer-events:none`;
+  document.getElementById('lu-screen').style.background=`radial-gradient(ellipse at 50% 30%,${ch.color}30,#000 65%)`;
+  document.getElementById('lu-title').textContent=`✦ ${ch.levelTitles[ti]} ✦`;
+  document.getElementById('lu-quote').textContent=ch.levelQuotes[qi];
+  const fw=document.getElementById('lu-fw');fw.innerHTML='';
+  for(let i=0;i<40;i++){const sp=document.createElement('div');sp.className='lusk';const a=Math.random()*360,dist=100+Math.random()*150,tx=Math.cos(a*Math.PI/180)*dist,ty=Math.sin(a*Math.PI/180)*dist;const cols=[ch.color,'#fff','#ffd700','#ff69b4',ch.color];sp.style.cssText=`background:${cols[Math.floor(Math.random()*cols.length)]};left:50%;top:40%;--tx:${tx}px;--ty:${ty}px;--dur:${.5+Math.random()*.8}s;--del:${Math.random()*.6}s;width:${3+Math.random()*5}px;height:${3+Math.random()*5}px`;fw.appendChild(sp);}
+  showScreen('lu-screen');snd('levelup');
+}
 function closeLU(){hideAllScreens();renderHome();}
 async function saveUser(){if(!CU||!CU.username)return;const{doc,setDoc}=window.FB;await setDoc(doc(window.db,'users',CU.username),CU);}
 /* ADD/EDIT */
 function openAdd(t){addType=t||3;selT(addType);document.getElementById('inp-name').value='';document.getElementById('inp-note').value='';om('add-modal');setTimeout(()=>document.getElementById('inp-name').focus(),350);}
 function selT(t){addType=t;document.querySelectorAll('.tc').forEach(c=>{const ct=+c.dataset.t;c.className='tc'+(ct===t?` tc${t}`:'');});document.getElementById('tmpl-area').innerHTML=TMPLS[t].map(s=>`<div class="tm" onclick="fillT('${esc(s)}')">${s}</div>`).join('');}
 function fillT(s){document.getElementById('inp-name').value=s;document.getElementById('inp-name').focus();}
-async function saveAct(){const name=document.getElementById('inp-name').value.trim();if(!name){document.getElementById('inp-name').focus();return;}const today=dobj();today.actions.push({id:uid(),type:addType,name,note:document.getElementById('inp-note').value.trim(),done:false,ts:Date.now()});await saveUser();cm('add-modal');renderHome();toast('✓ 已記錄','tg');snd('click');}
+async function saveAct(){
+  const name=document.getElementById('inp-name').value.trim();if(!name){document.getElementById('inp-name').focus();return;}
+  const today=dobj();
+  today.actions.push({id:uid(),type:addType,name,note:document.getElementById('inp-note').value.trim(),done:true,ts:Date.now()});
+  CU.xp=(CU.xp||0)+XPP[addType];
+  const ac=today.actions;
+  const d3=ac.filter(a=>a.type===3).length;
+  const d1=ac.filter(a=>a.type===1).length;
+  const d2=ac.filter(a=>a.type===2).length;
+  if(d3>=3&&d1>=1&&d2>=2&&!today.completed){
+    today.completed=true;addTL('🎯','今日 3-1-2 全部達標！');
+    setTimeout(()=>toast('🎉 今日 3-1-2 全部達標！','to'),300);snd('complete');
+  }
+  await saveUser();await chkLvUp();
+  cm('add-modal');renderHome();toast(`✓ 已記錄 +${XPP[addType]}XP`,'tg');snd('check');
+}
 function openEditAct(e,id){e.stopPropagation();const a=dobj().actions.find(x=>x.id===id);if(!a)return;editAid=id;document.getElementById('edit-name').value=a.name||'';document.getElementById('edit-note').value=a.note||'';om('edit-modal');}
 async function saveEdit(){const a=dobj().actions.find(x=>x.id===editAid);if(a){a.name=document.getElementById('edit-name').value.trim()||a.name;a.note=document.getElementById('edit-note').value.trim();await saveUser();cm('edit-modal');renderHome();toast('已更新','tg');}}
-function delActCf(){showCf('刪除記錄','確定要刪除這筆記錄嗎？',async()=>{const today=dobj();const a=today.actions.find(x=>x.id===editAid);if(a&&a.done)CU.xp=Math.max(0,(CU.xp||0)-XPP[a.type]);today.actions=today.actions.filter(x=>x.id!==editAid);await saveUser();cm('edit-modal');renderHome();toast('已刪除','tg');});}
+function delActCf(){showCf('刪除記錄','確定要刪除這筆記錄嗎？',async()=>{
+  const today=dobj();const a=today.actions.find(x=>x.id===editAid);
+  if(a) CU.xp=Math.max(0,(CU.xp||0)-XPP[a.type]);
+  today.actions=today.actions.filter(x=>x.id!==editAid);
+  const ac=today.actions;
+  today.completed=ac.filter(x=>x.type===3).length>=3&&ac.filter(x=>x.type===1).length>=1&&ac.filter(x=>x.type===2).length>=2;
+  await saveUser();cm('edit-modal');renderHome();toast('已刪除','tg');
+});}
 /* STATS */
 function renderStats(){
   if(!CU)return;
   const ch=CHARS[CU.charId]||CHARS.resonator,lv=CU.level||1,s=streak();
-  buildAvatar('stats-av',CU.charId,lv,true);
+  const _sav=document.getElementById('stats-av');if(_sav){const _si=getImgUrl(CU.charId,CU.gender,getStage(lv));_sav.innerHTML=`<img src="${_si}" style="width:60px;height:80px;object-fit:cover;object-position:center top;border-radius:10px" onerror="this.style.display='none'">`;}
   const ti=Math.min(Math.floor((lv-1)/4),ch.levelTitles.length-1);
   document.getElementById('sc-name').textContent=CU.name;
   document.getElementById('sc-sub').textContent=`${CU.region} · 大C：${CU.leader} · ${ch.levelTitles[ti]}`;
