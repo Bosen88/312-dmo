@@ -434,7 +434,7 @@ nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-w
         <div class="setr" onclick="exportData()"><div class="seti">📤</div><div class="setii"><div class="setn">匯出我的記錄</div><div class="sets">下載 JSON 備份</div></div><div style="color:var(--muted);font-size:.8rem">›</div></div>
         <div class="setr" onclick="doLogout()"><div class="seti">🚪</div><div class="setii"><div class="setn">登出</div><div class="sets">返回登入頁面</div></div><div style="color:var(--muted);font-size:.8rem">›</div></div>
         <div class="card" style="text-align:center;margin-top:4px;padding:24px">
-          <div style="font-family:var(--orb);font-size:1.1rem;background:linear-gradient(135deg,var(--gold),var(--purple2));-webkit-background-clip:text;-webkit-text-fill-color:transparent">3-1-2 DMO v3.8</div>
+          <div style="font-family:var(--orb);font-size:1.1rem;background:linear-gradient(135deg,var(--gold),var(--purple2));-webkit-background-clip:text;-webkit-text-fill-color:transparent">3-1-2 DMO v3.9</div>
           <div style="font-size:.66rem;color:var(--muted);margin-top:10px;line-height:1.8">成功不是靠爆發，而是靠每天重複簡單動作<br><span style="color:var(--gold)">流量</span> · <span style="color:var(--blue)">曝光</span> · <span style="color:var(--purple)">跟進</span></div>
         </div>
       </div>
@@ -490,6 +490,16 @@ nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-w
     <div class="mr"><button class="btn btn-danger" style="width:auto;padding:12px 20px" onclick="delActCf()">刪除</button><button class="btn btn-gold" onclick="saveEdit()">儲存</button></div>
   </div>
 </div>
+<div class="mb" id="mgoal-modal" onclick="cmc('mgoal-modal',event)">
+  <div class="ms"><div class="mh"></div><div class="mt" id="mg-title">設定月目標</div>
+    <div id="mg-cur" style="font-size:.68rem;color:var(--muted2);margin-bottom:12px"></div>
+    <div class="il">本月 BV 目標</div><input class="inp" id="mg-bv" type="number" inputmode="numeric" placeholder="例：400（填 0 表示不設定）">
+    <div class="il">本月 IBV 目標</div><input class="inp" id="mg-ibv" type="number" inputmode="numeric" placeholder="例：200（填 0 表示不設定）">
+    <div class="il">本月利潤目標（元）</div><input class="inp" id="mg-income" type="number" inputmode="numeric" placeholder="例：12000（填 0 表示不設定）">
+    <div style="font-size:.66rem;color:var(--muted2);line-height:1.7;margin-bottom:14px">💡 月目標由你設定，店主自己拆成每週目標。店主達成整月目標可獲得 <span style="color:var(--purple2)">+150 XP</span>（每月一次）。目標只套用當月，跨月需重設。</div>
+    <div class="mr"><button class="btn btn-ghost" style="width:auto;padding:12px 20px" onclick="cm('mgoal-modal')">取消</button><button class="btn btn-gold" onclick="saveMonthGoal()">儲存月目標 ✓</button></div>
+  </div>
+</div>
 <div class="mb" id="edit-grp-modal" onclick="cmc('edit-grp-modal',event)">
   <div class="ms"><div class="mh"></div><div class="mt" id="eg-title">編輯分組</div>
     <div class="il">所在地區</div><input class="inp" id="eg-region" placeholder="例：台南" maxlength="20">
@@ -541,6 +551,7 @@ nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-w
 </div>
 <div class="mb" id="goal-modal" onclick="cmc('goal-modal',event)">
   <div class="ms"><div class="mh"></div><div class="mt">每週零售目標</div>
+    <div id="goal-month-hint"></div>
     <div class="il">每週 BV 目標</div><input class="inp" id="g-bv" type="number" inputmode="numeric" placeholder="例：100（填 0 表示不設定）">
     <div class="il">每週 IBV 目標</div><input class="inp" id="g-ibv" type="number" inputmode="numeric" placeholder="例：50（填 0 表示不設定）">
     <div class="il">每週利潤目標（元）</div><input class="inp" id="g-income" type="number" inputmode="numeric" placeholder="例：3000（填 0 表示不設定）">
@@ -828,7 +839,10 @@ function showLU(lv){
   showScreen('lu-screen');snd('levelup');
 }
 function closeLU(){hideAllScreens();renderHome();}
-async function saveUser(){if(!CU||!CU.username)return;const{doc,setDoc}=window.FB;await setDoc(doc(window.db,'users',CU.username),CU);}
+async function saveUser(){if(!CU||!CU.username)return;const{doc,setDoc,getDoc}=window.FB;
+  // 月目標由小C管理者寫入，存檔前先抓雲端最新值合併，避免覆蓋掉別人剛設的月目標
+  try{const snap=await getDoc(doc(window.db,'users',CU.username));if(snap.exists()){const remote=snap.data();const rmg=remote.retail&&remote.retail.monthGoal;if(rmg){if(!CU.retail)CU.retail={};CU.retail.monthGoal=rmg;}}}catch(e){}
+  await setDoc(doc(window.db,'users',CU.username),CU);}
 /* ADD/EDIT */
 function openAdd(t){addType=t||3;selT(addType);document.getElementById('inp-name').value='';document.getElementById('inp-note').value='';om('add-modal');setTimeout(()=>document.getElementById('inp-name').focus(),350);}
 function selT(t){addType=t;document.querySelectorAll('.tc').forEach(c=>{const ct=+c.dataset.t;c.className='tc'+(ct===t?` tc${t}`:'');});document.getElementById('tmpl-area').innerHTML=TMPLS[t].map(s=>`<div class="tm" onclick="fillT('${esc(s)}')">${s}</div>`).join('');}
@@ -861,7 +875,12 @@ function delActCf(){showCf('刪除記錄','確定要刪除這筆記錄嗎？',as
 });}
 /* RETAIL */
 let editSid=null,lbMode='all';
-function retail(){if(!CU.retail)CU.retail={};const r=CU.retail;if(!r.weeklyGoal)r.weeklyGoal={bv:0,ibv:0,income:0};if(r.weeklyGoal.ibv===undefined)r.weeklyGoal.ibv=0;if(!r.sales)r.sales=[];if(!r.bonusWeeks)r.bonusWeeks={};if(r.recommend===undefined)r.recommend='';return r;}
+function retail(){if(!CU.retail)CU.retail={};const r=CU.retail;if(!r.weeklyGoal)r.weeklyGoal={bv:0,ibv:0,income:0};if(r.weeklyGoal.ibv===undefined)r.weeklyGoal.ibv=0;if(!r.monthGoal)r.monthGoal={ym:'',bv:0,ibv:0,income:0,setBy:''};if(!r.sales)r.sales=[];if(!r.bonusWeeks)r.bonusWeeks={};if(!r.bonusMonths)r.bonusMonths={};if(r.recommend===undefined)r.recommend='';return r;}
+function curYM(){const n=new Date();return`${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}`;}
+function ymLabel(ym){if(!ym)return'';const[y,m]=ym.split('-');return`${y} 年 ${+m} 月`;}
+function monthSales(u){const ym=curYM();return uSales(u||CU).filter(s=>(s.date||'').slice(0,7)===ym);}
+// 取得本月有效的月目標（ym 對得上才算數）
+function activeMonthGoal(u){const r=(u||CU).retail||{};const g=r.monthGoal||{};return(g.ym===curYM())?g:null;}
 function mondayOf(d){const x=new Date(d);x.setDate(x.getDate()-((x.getDay()+6)%7));return`${x.getFullYear()}-${String(x.getMonth()+1).padStart(2,'0')}-${String(x.getDate()).padStart(2,'0')}`;}
 function fmtMoney(n){return(+n||0).toLocaleString('zh-TW');}
 function uSales(u){return(u&&u.retail&&u.retail.sales)||[];}
@@ -875,7 +894,13 @@ function renderRetail(){
   const r=retail(),ws=weekSales(),wp=sumProfit(ws),wb=sumBV(ws),wi=sumIBV(ws),g=r.weeklyGoal||{};
   document.getElementById('acR').textContent='$'+fmtMoney(wp);
   const bar=(label,val,goal,col,money)=>{const vT=money?'$'+fmtMoney(val):val,gT=money?'$'+fmtMoney(goal):goal;if(goal>0){const pct=Math.min(100,Math.round(val/goal*100));return`<div style="margin-bottom:8px"><div class="xpr"><span>${label}</span><span>${vT} / ${gT}（${pct}%）</span></div><div class="xpt" style="height:8px"><div class="xpb" style="width:${pct}%;background:linear-gradient(90deg,${col},${col}aa)"></div></div></div>`;}return`<div style="display:flex;justify-content:space-between;font-size:.74rem;color:var(--muted2);margin-bottom:6px;font-family:var(--mono)"><span>${label}</span><span style="color:${col}">${vT}</span></div>`;};
-  el.innerHTML=`<div class="card" style="margin-bottom:6px">${bar('本週利潤',wp,+g.income||0,'var(--green2)',true)}${bar('本週 BV',wb,+g.bv||0,'var(--gold)',false)}${(+g.ibv||wi)?bar('本週 IBV',wi,+g.ibv||0,'var(--blue)',false):''}<div style="font-size:.62rem;color:var(--muted);margin-top:2px">本週 ${ws.length} 筆${(+g.bv||+g.ibv||+g.income)?'':' · 到「設定」訂每週目標可拿達標獎勵'}</div></div>`;
+  // 月目標卡
+  const mg=activeMonthGoal();let monthHtml='';
+  if(mg&&(+mg.bv||+mg.ibv||+mg.income)){
+    const ms=monthSales(),mp=sumProfit(ms),mb=sumBV(ms),mi=sumIBV(ms);
+    monthHtml=`<div class="card" style="margin-bottom:6px;border-color:rgba(176,110,255,.25)"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-family:var(--orb);font-size:.72rem;color:var(--purple2)">📅 ${ymLabel(mg.ym)} 月目標</span><span style="font-size:.56rem;color:var(--muted2)">${mg.setBy?`由 ${esc(mg.setBy)} 指定`:''}</span></div>${(+mg.income)?bar('本月利潤',mp,+mg.income,'var(--purple2)',true):''}${(+mg.bv)?bar('本月 BV',mb,+mg.bv,'var(--purple)',false):''}${(+mg.ibv)?bar('本月 IBV',mi,+mg.ibv,'var(--blue)',false):''}<div style="font-size:.6rem;color:var(--muted);margin-top:2px">達成整月目標 +150XP</div></div>`;
+  }
+  el.innerHTML=monthHtml+`<div class="card" style="margin-bottom:6px">${bar('本週利潤',wp,+g.income||0,'var(--green2)',true)}${bar('本週 BV',wb,+g.bv||0,'var(--gold)',false)}${(+g.ibv||wi)?bar('本週 IBV',wi,+g.ibv||0,'var(--blue)',false):''}<div style="font-size:.62rem;color:var(--muted);margin-top:2px">本週 ${ws.length} 筆${(+g.bv||+g.ibv||+g.income)?'':' · 到「設定」訂每週目標可拿達標獎勵'}</div></div>`;
 }
 let careSel=[7,14,30];
 function addDays(dstr,n){const d=new Date(dstr+'T00:00:00');d.setDate(d.getDate()+n);return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
@@ -932,7 +957,7 @@ async function saveSale(){
     addTL('💰',`賣出 ${item}，利潤 $${fmtMoney(price-cost)}`);
     toast(`✓ 已記錄銷售 +${bv}XP`,'tg');snd('check');
   }
-  checkWeekGoal();
+  checkWeekGoal();checkMonthGoal();
   await saveUser();await chkLvUp();
   cm('sale-modal');renderHome();
   if(document.getElementById('page-stats').classList.contains('active'))renderStats();
@@ -957,8 +982,22 @@ function checkWeekGoal(){
     setTimeout(()=>{toast('🏅 本週零售目標達成 +50XP','to');snd('complete');},700);
   }
 }
-function openGoal(){const g=retail().weeklyGoal||{};document.getElementById('g-bv').value=g.bv||'';document.getElementById('g-ibv').value=g.ibv||'';document.getElementById('g-income').value=g.income||'';om('goal-modal');}
-async function saveGoal(){const r=retail();r.weeklyGoal={bv:+document.getElementById('g-bv').value||0,ibv:+document.getElementById('g-ibv').value||0,income:+document.getElementById('g-income').value||0};checkWeekGoal();await saveUser();cm('goal-modal');renderSet();renderRetail();toast('週目標已更新','tg');}
+function checkMonthGoal(){
+  const r=retail(),mg=activeMonthGoal();
+  if(!mg)return;
+  const tBV=+mg.bv||0,tIBV=+mg.ibv||0,tInc=+mg.income||0;
+  if(!tBV&&!tIBV&&!tInc)return;
+  const ym=curYM();
+  if(r.bonusMonths[ym])return;
+  const ms=monthSales();
+  if((!tBV||sumBV(ms)>=tBV)&&(!tIBV||sumIBV(ms)>=tIBV)&&(!tInc||sumProfit(ms)>=tInc)){
+    r.bonusMonths[ym]=true;CU.xp=(CU.xp||0)+150;
+    addTL('🏆',`${ymLabel(ym)}月目標達成！+150XP`);
+    setTimeout(()=>{toast('🏆 本月目標達成 +150XP！','to');snd('complete');},900);
+  }
+}
+function openGoal(){const g=retail().weeklyGoal||{};document.getElementById('g-bv').value=g.bv||'';document.getElementById('g-ibv').value=g.ibv||'';document.getElementById('g-income').value=g.income||'';const mh=document.getElementById('goal-month-hint');const mg=activeMonthGoal();if(mh){if(mg&&(+mg.bv||+mg.ibv||+mg.income)){const parts=[];if(+mg.bv)parts.push(`BV ${mg.bv}`);if(+mg.ibv)parts.push(`IBV ${mg.ibv}`);if(+mg.income)parts.push(`利潤 $${fmtMoney(mg.income)}`);const wkInM=Math.ceil(new Date(new Date().getFullYear(),new Date().getMonth()+1,0).getDate()/7);mh.innerHTML=`<div style="background:var(--purple-dim);border:1px solid rgba(176,110,255,.25);border-radius:var(--r-sm);padding:10px 12px;margin-bottom:12px;font-size:.7rem;line-height:1.7"><div style="color:var(--purple2);font-weight:700;margin-bottom:3px">📅 ${ymLabel(mg.ym)}月目標（${mg.setBy?esc(mg.setBy)+' 指定':'已指定'}）</div><div style="color:var(--muted2)">${parts.join('・')}</div><div style="color:var(--muted);margin-top:4px">本月約 ${wkInM} 週，自己拆成每週目標，週週達標也累積月成績 💪</div></div>`;}else{mh.innerHTML='';}}om('goal-modal');}
+async function saveGoal(){const r=retail();r.weeklyGoal={bv:+document.getElementById('g-bv').value||0,ibv:+document.getElementById('g-ibv').value||0,income:+document.getElementById('g-income').value||0};checkWeekGoal();checkMonthGoal();await saveUser();cm('goal-modal');renderSet();renderRetail();toast('週目標已更新','tg');}
 let ledgerMode='week';
 function setLedger(m){ledgerMode=m;['week','month','all'].forEach(x=>{const t=document.getElementById('lgt-'+x);if(t)t.classList.toggle('active',x===m);});renderLedger();}
 function daysBetween(fromK,toK){const a=new Date(fromK+'T00:00:00'),b=new Date(toK+'T00:00:00');return Math.round((b-a)/86400000);}
@@ -1139,7 +1178,7 @@ function renderAdminContent(byL,filter,sub){
   const grpLabel=sub?'小C':'大C';
   document.getElementById('admin-content').innerHTML=teams.length?teams.map(leader=>{const users=byL[leader]||[],done=users.filter(u=>u.days&&u.days[today]&&u.days[today].completed).length;return`<div class="ats"><div class="ath"><div class="atn">👥 ${grpLabel}：${esc(leader)}</div><div style="display:flex;gap:6px;flex-wrap:wrap"><span class="pill purple">${users.length}人</span><span class="pill green">${done}達標</span></div></div>${users.map(u=>{const ch=CHARS[u.charId]||CHARS.resonator,d=u.days&&u.days[today],p3=d?(d.actions||[]).filter(a=>a.type===3&&a.done).length:0,p1=d?(d.actions||[]).filter(a=>a.type===1&&a.done).length:0,p2=d?(d.actions||[]).filter(a=>a.type===2&&a.done).length:0;const subTag=u.role==='subadmin'?` <span class="pill purple" style="font-size:.5rem">小C管理</span>`:'';
   // 主管理者：帳本+指定小C管理+重置+刪除；小C管理者：只有帳本
-  const btns=sub?`<button class="abtn" style="background:var(--green-dim);border-color:rgba(34,211,122,.3);color:var(--green2)" onclick="openLedgerModal('${u.username}')">📒 帳本</button>`:`<button class="abtn" style="background:var(--green-dim);border-color:rgba(34,211,122,.3);color:var(--green2)" onclick="openLedgerModal('${u.username}')">📒 帳本</button><button class="abtn" style="background:var(--blue-dim);border-color:rgba(96,165,250,.3);color:var(--blue)" onclick="openEditGrp('${u.username}')">✏️ 編輯</button><button class="abtn" style="background:var(--purple-dim);border-color:rgba(176,110,255,.3);color:var(--purple2)" onclick="openManageSub('${u.username}','${esc(u.name)}')">🛡️ 小C權限</button><button class="abtn reset" onclick="adminReset('${u.username}','${esc(u.name)}')">重置XP</button><button class="abtn del" onclick="adminDel('${u.username}','${esc(u.name)}')">刪除</button>`;
+  const btns=sub?`<button class="abtn" style="background:var(--green-dim);border-color:rgba(34,211,122,.3);color:var(--green2)" onclick="openLedgerModal('${u.username}')">📒 帳本</button><button class="abtn" style="background:var(--purple-dim);border-color:rgba(176,110,255,.3);color:var(--purple2)" onclick="openMonthGoal('${u.username}')">🎯 月目標</button>`:`<button class="abtn" style="background:var(--green-dim);border-color:rgba(34,211,122,.3);color:var(--green2)" onclick="openLedgerModal('${u.username}')">📒 帳本</button><button class="abtn" style="background:var(--purple-dim);border-color:rgba(176,110,255,.3);color:var(--purple2)" onclick="openMonthGoal('${u.username}')">🎯 月目標</button><button class="abtn" style="background:var(--blue-dim);border-color:rgba(96,165,250,.3);color:var(--blue)" onclick="openEditGrp('${u.username}')">✏️ 編輯</button><button class="abtn" style="background:var(--purple-dim);border-color:rgba(176,110,255,.3);color:var(--purple2)" onclick="openManageSub('${u.username}','${esc(u.name)}')">🛡️ 小C權限</button><button class="abtn reset" onclick="adminReset('${u.username}','${esc(u.name)}')">重置XP</button><button class="abtn del" onclick="adminDel('${u.username}','${esc(u.name)}')">刪除</button>`;
   return`<div class="aur">${charEmblem(u.charId,40,u.role==='subadmin')}<div class="auri"><div class="aurna">${esc(u.name)} <span style="font-size:.6rem;color:var(--muted2);font-weight:400">${u.username}</span>${subTag}</div><div class="aursu">${esc(u.region||'')} · Lv.${u.level||1} · ${u.xp||0}XP · ${d&&d.completed?'✅今日達標':`⏳ ${p3}-${p1}-${p2}`}${!sub&&u.subLeader?` · 小C：${esc(u.subLeader)}`:''}<br>加入：${(u.createdAt||'').slice(0,10)}</div></div><div class="auba">${btns}</div></div>`;}).join('')}</div>`;}).join(''):'<div style="color:var(--muted);font-size:.85rem;padding:20px 0;text-align:center">尚無用戶資料</div>';
 }
 function adminReset(username,name){showCf(`重置 ${name} 的 XP`,`確定要重置「${name}」的等級和 XP 嗎？行動記錄會保留。`,async()=>{const{doc,updateDoc}=window.FB;await updateDoc(doc(window.db,'users',username),{xp:0,level:1,timeline:[]});toast(`已重置 ${name} 的 XP`,'tb');renderAdmin();});}
@@ -1147,6 +1186,31 @@ function adminDel(username,name){showCf(`刪除用戶 ${name}`,`確定要永久�
 /* 編輯店主分組（僅主管理者）：地區/大C/小C */
 let egUser=null;
 function allUsersFlat(){return window._abl?Object.values(window._abl).flat():[];}
+/* 設店主月目標（小C管理者對自己組員、主管理者對所有人） */
+let mgUser=null;
+function canSetMonthGoal(u){if(IS_ADMIN)return true;if(CU&&CU.role==='subadmin'&&CU.managedSubC&&(u.subLeader||'')===CU.managedSubC)return true;return false;}
+function openMonthGoal(username){
+  const u=allUsersFlat().find(x=>x.username===username);if(!u)return;
+  if(!canSetMonthGoal(u)){toast('沒有權限設定此人月目標','tr');return;}
+  mgUser=u;
+  const g=(u.retail&&u.retail.monthGoal)||{};const active=g.ym===curYM();
+  document.getElementById('mg-title').textContent=`設定 ${u.name} 的月目標`;
+  document.getElementById('mg-cur').textContent=`目標月份：${ymLabel(curYM())}`;
+  document.getElementById('mg-bv').value=active&&g.bv?g.bv:'';
+  document.getElementById('mg-ibv').value=active&&g.ibv?g.ibv:'';
+  document.getElementById('mg-income').value=active&&g.income?g.income:'';
+  om('mgoal-modal');
+}
+async function saveMonthGoal(){
+  if(!mgUser)return;
+  if(!canSetMonthGoal(mgUser)){toast('沒有權限','tr');return;}
+  const bv=+document.getElementById('mg-bv').value||0,ibv=+document.getElementById('mg-ibv').value||0,income=+document.getElementById('mg-income').value||0;
+  const{doc,updateDoc}=window.FB;
+  // 只寫 monthGoal 單一欄位，降低與店主同時編輯的衝突
+  await updateDoc(doc(window.db,'users',mgUser.username),{'retail.monthGoal':{ym:curYM(),bv,ibv,income,setBy:(IS_ADMIN?'管理者':CU.name)}});
+  toast(`✓ 已設定 ${mgUser.name} 的 ${ymLabel(curYM())}月目標`,'tg');
+  cm('mgoal-modal');renderAdmin();
+}
 function openEditGrp(username){
   const u=allUsersFlat().find(x=>x.username===username);if(!u)return;
   egUser=u;
