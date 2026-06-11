@@ -426,7 +426,7 @@ nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-w
         <div class="setr" onclick="exportData()"><div class="seti">📤</div><div class="setii"><div class="setn">匯出我的記錄</div><div class="sets">下載 JSON 備份</div></div><div style="color:var(--muted);font-size:.8rem">›</div></div>
         <div class="setr" onclick="doLogout()"><div class="seti">🚪</div><div class="setii"><div class="setn">登出</div><div class="sets">返回登入頁面</div></div><div style="color:var(--muted);font-size:.8rem">›</div></div>
         <div class="card" style="text-align:center;margin-top:4px;padding:24px">
-          <div style="font-family:var(--orb);font-size:1.1rem;background:linear-gradient(135deg,var(--gold),var(--purple2));-webkit-background-clip:text;-webkit-text-fill-color:transparent">3-1-2 DMO v3.5</div>
+          <div style="font-family:var(--orb);font-size:1.1rem;background:linear-gradient(135deg,var(--gold),var(--purple2));-webkit-background-clip:text;-webkit-text-fill-color:transparent">3-1-2 DMO v3.6</div>
           <div style="font-size:.66rem;color:var(--muted);margin-top:10px;line-height:1.8">成功不是靠爆發，而是靠每天重複簡單動作<br><span style="color:var(--gold)">流量</span> · <span style="color:var(--blue)">曝光</span> · <span style="color:var(--purple)">跟進</span></div>
         </div>
       </div>
@@ -922,11 +922,19 @@ function openGoal(){const g=retail().weeklyGoal||{};document.getElementById('g-b
 async function saveGoal(){const r=retail();r.weeklyGoal={bv:+document.getElementById('g-bv').value||0,ibv:+document.getElementById('g-ibv').value||0,income:+document.getElementById('g-income').value||0};checkWeekGoal();await saveUser();cm('goal-modal');renderSet();renderRetail();toast('週目標已更新','tg');}
 let ledgerMode='week';
 function setLedger(m){ledgerMode=m;['week','month','all'].forEach(x=>{const t=document.getElementById('lgt-'+x);if(t)t.classList.toggle('active',x===m);});renderLedger();}
+function daysBetween(fromK,toK){const a=new Date(fromK+'T00:00:00'),b=new Date(toK+'T00:00:00');return Math.round((b-a)/86400000);}
 function renderCareList(){
   const el=document.getElementById('care-list');if(!el)return;
-  const todayK=dk(),pend=pendingCares().filter(c=>c.date<=addDays(todayK,3));// 顯示已到期+3天內
+  const todayK=dk(),pend=pendingCares();// 全部未完成的關懷
   if(!pend.length){el.innerHTML='<div class="card" style="text-align:center;color:var(--muted);font-size:.78rem;padding:14px">目前沒有待關懷的顧客 👍</div>';return;}
-  el.innerHTML=pend.slice(0,10).map(c=>{const tag=c.overdue?'<span style="color:var(--red)">已到期</span>':c.today?'<span style="color:var(--gold)">今天</span>':`<span style="color:var(--blue)">${c.date}</span>`;return`<div class="ai" style="border-color:${c.overdue?'rgba(255,68,102,.3)':c.today?'rgba(245,200,66,.3)':'var(--border)'}"><div class="ab"><div class="an">🔔 ${esc(c.item)}${c.customer?` → ${esc(c.customer)}`:''}</div><div class="ano">關懷日 ${esc(c.date)} · ${tag}</div></div><button class="aed" style="background:var(--green-dim);border-color:rgba(34,211,122,.3);color:var(--green2)" onclick="markCareDone('${c.sid}',${c.idx})">✓ 已關懷</button></div>`;}).join('');
+  el.innerHTML=pend.slice(0,30).map(c=>{
+    const dleft=daysBetween(todayK,c.date);
+    let tag,bdr,future=false;
+    if(c.overdue){tag=`<span style="color:var(--red)">已逾期 ${Math.abs(dleft)} 天</span>`;bdr='rgba(255,68,102,.3)';}
+    else if(c.today){tag='<span style="color:var(--gold)">今天要關懷</span>';bdr='rgba(245,200,66,.3)';}
+    else{tag=`<span style="color:var(--muted2)">還有 ${dleft} 天（${esc(c.date)}）</span>`;bdr='var(--border)';future=true;}
+    return`<div class="ai" style="border-color:${bdr}${future?';opacity:.7':''}"><div class="ab"><div class="an">🔔 ${esc(c.item)}${c.customer?` → ${esc(c.customer)}`:''}</div><div class="ano">${tag}</div></div><button class="aed" style="background:var(--green-dim);border-color:rgba(34,211,122,.3);color:var(--green2)" onclick="markCareDone('${c.sid}',${c.idx})">✓ 已關懷</button></div>`;
+  }).join('');
 }
 function ledgerFilter(all){if(ledgerMode==='all')return all;const from=ledgerMode==='month'?periodFrom('month'):mondayOf(new Date());return all.filter(s=>(s.date||'')>=from);}
 function renderLedger(){
