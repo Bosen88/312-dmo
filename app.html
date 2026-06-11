@@ -421,12 +421,13 @@ nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-w
         <div class="setr" onclick="reQuiz()"><div class="seti">🎮</div><div class="setii"><div class="setn">重新測驗人格</div><div class="sets">換一個角色類型</div></div><div style="color:var(--muted);font-size:.8rem">›</div></div>
         <div class="setr" onclick="reGender()"><div class="seti">👤</div><div class="setii"><div class="setn">更換角色性別</div><div class="sets">切換男性/女性立繪</div></div><div style="color:var(--muted);font-size:.8rem">›</div></div>
         <div class="setr" onclick="openGoal()"><div class="seti">🎯</div><div class="setii"><div class="setn">每週零售目標</div><div class="sets" id="goal-sub">設定每週 BV / 利潤目標</div></div><div style="color:var(--muted);font-size:.8rem">›</div></div>
+        <div class="setr" onclick="openMySubC()"><div class="seti">🧩</div><div class="setii"><div class="setn">我的小C</div><div class="sets" id="mysubc-sub">設定所屬小C</div></div><div style="color:var(--muted);font-size:.8rem">›</div></div>
         <div class="setr" id="subadmin-entry" style="display:none;border-color:rgba(176,110,255,.3);background:var(--purple-dim)" onclick="goPage('admin')"><div class="seti">🛡️</div><div class="setii"><div class="setn">小C 管理後台</div><div class="sets" id="subadmin-sub">管理我的小C團隊</div></div><div style="color:var(--muted);font-size:.8rem">›</div></div>
         <div class="lbl" style="margin-top:4px">帳號操作</div>
         <div class="setr" onclick="exportData()"><div class="seti">📤</div><div class="setii"><div class="setn">匯出我的記錄</div><div class="sets">下載 JSON 備份</div></div><div style="color:var(--muted);font-size:.8rem">›</div></div>
         <div class="setr" onclick="doLogout()"><div class="seti">🚪</div><div class="setii"><div class="setn">登出</div><div class="sets">返回登入頁面</div></div><div style="color:var(--muted);font-size:.8rem">›</div></div>
         <div class="card" style="text-align:center;margin-top:4px;padding:24px">
-          <div style="font-family:var(--orb);font-size:1.1rem;background:linear-gradient(135deg,var(--gold),var(--purple2));-webkit-background-clip:text;-webkit-text-fill-color:transparent">3-1-2 DMO v3.6</div>
+          <div style="font-family:var(--orb);font-size:1.1rem;background:linear-gradient(135deg,var(--gold),var(--purple2));-webkit-background-clip:text;-webkit-text-fill-color:transparent">3-1-2 DMO v3.7</div>
           <div style="font-size:.66rem;color:var(--muted);margin-top:10px;line-height:1.8">成功不是靠爆發，而是靠每天重複簡單動作<br><span style="color:var(--gold)">流量</span> · <span style="color:var(--blue)">曝光</span> · <span style="color:var(--purple)">跟進</span></div>
         </div>
       </div>
@@ -480,6 +481,24 @@ nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-w
     <div class="il">對象 / 事項</div><input class="inp" id="edit-name" maxlength="30">
     <div class="il">備註</div><input class="inp" id="edit-note" maxlength="60">
     <div class="mr"><button class="btn btn-danger" style="width:auto;padding:12px 20px" onclick="delActCf()">刪除</button><button class="btn btn-gold" onclick="saveEdit()">儲存</button></div>
+  </div>
+</div>
+<div class="mb" id="edit-grp-modal" onclick="cmc('edit-grp-modal',event)">
+  <div class="ms"><div class="mh"></div><div class="mt" id="eg-title">編輯分組</div>
+    <div class="il">所在地區</div><input class="inp" id="eg-region" placeholder="例：台南" maxlength="20">
+    <div class="il">所屬大C</div>
+    <select class="inp" id="eg-leader-sel" onchange="egLeaderSel()" style="color-scheme:dark"></select>
+    <input class="inp" id="eg-leader-new" placeholder="輸入新的大C名稱" maxlength="20" style="display:none;margin-top:6px">
+    <div class="il">所屬小C（可留空）</div><input class="inp" id="eg-subleader" placeholder="例：怡方小C" maxlength="20">
+    <div style="font-size:.66rem;color:var(--muted2);line-height:1.6;margin-bottom:14px">💡 大C 從現有清單選可避免名稱打錯分裂；確實要開新組才選「＋ 新增大C」</div>
+    <div class="mr"><button class="btn btn-ghost" style="width:auto;padding:12px 20px" onclick="cm('edit-grp-modal')">取消</button><button class="btn btn-gold" onclick="saveGrp()">儲存 ✓</button></div>
+  </div>
+</div>
+<div class="mb" id="subc-modal" onclick="cmc('subc-modal',event)">
+  <div class="ms"><div class="mh"></div><div class="mt">我的小C</div>
+    <div class="il">所屬小C（小組長名稱，可留空）</div><input class="inp" id="my-subc" placeholder="例：怡方小C" maxlength="20">
+    <div style="font-size:.66rem;color:var(--muted2);line-height:1.6;margin-bottom:14px">💡 不確定填什麼可以問你的小組長。地區和大C如需修改請聯絡管理者。</div>
+    <div class="mr"><button class="btn btn-ghost" style="width:auto;padding:12px 20px" onclick="cm('subc-modal')">取消</button><button class="btn btn-gold" onclick="saveMySubC()">儲存 ✓</button></div>
   </div>
 </div>
 <div class="mb" id="name-modal" onclick="cmc('name-modal',event)">
@@ -1052,8 +1071,13 @@ function calcMS(m){let s=0;const d=new Date();for(let i=0;i<365;i++){const k=`${
 function m3d(v,t,l){const cls=v>=t?'full':v>0?'part':'';return`<div class="m3d ${cls}"><div class="m3v">${v}/${t}</div><div class="m3k">${l}</div></div>`;}
 function cheer(e,name){e.stopPropagation();toast(`💪 為 ${name} 打氣！加油衝！`,'tp');snd('check');}
 /* SETTINGS */
-function renderSet(){if(!CU)return;const ch=CHARS[CU.charId]||CHARS.resonator;document.getElementById('sr-icon').textContent=ch.emoji;document.getElementById('sr-name').textContent=`${CU.name}（${CU.username}）`;document.getElementById('sr-sub').textContent=`${CU.region} · 大C：${CU.leader}${CU.subLeader?` · 小C：${CU.subLeader}`:''} · Lv.${CU.level||1} · ${CU.xp||0} XP`;const g=(CU.retail&&CU.retail.weeklyGoal)||{};const gs=document.getElementById('goal-sub');if(gs){const parts=[];if(+g.bv)parts.push(`BV ${g.bv}`);if(+g.ibv)parts.push(`IBV ${g.ibv}`);if(+g.income)parts.push(`利潤 $${fmtMoney(g.income)}`);gs.textContent=parts.length?'每週 '+parts.join(' · '):'尚未設定，點擊設定（達標 +50XP）';}const se=document.getElementById('subadmin-entry');if(se){const isSub=CU.role==='subadmin'&&CU.managedSubC;se.style.display=isSub?'flex':'none';if(isSub)document.getElementById('subadmin-sub').textContent=`管理小C：${CU.managedSubC}`;}}
+function renderSet(){if(!CU)return;const ch=CHARS[CU.charId]||CHARS.resonator;document.getElementById('sr-icon').textContent=ch.emoji;document.getElementById('sr-name').textContent=`${CU.name}（${CU.username}）`;document.getElementById('sr-sub').textContent=`${CU.region} · 大C：${CU.leader}${CU.subLeader?` · 小C：${CU.subLeader}`:''} · Lv.${CU.level||1} · ${CU.xp||0} XP`;const g=(CU.retail&&CU.retail.weeklyGoal)||{};const gs=document.getElementById('goal-sub');if(gs){const parts=[];if(+g.bv)parts.push(`BV ${g.bv}`);if(+g.ibv)parts.push(`IBV ${g.ibv}`);if(+g.income)parts.push(`利潤 $${fmtMoney(g.income)}`);gs.textContent=parts.length?'每週 '+parts.join(' · '):'尚未設定，點擊設定（達標 +50XP）';}const se=document.getElementById('subadmin-entry');if(se){const isSub=CU.role==='subadmin'&&CU.managedSubC;se.style.display=isSub?'flex':'none';if(isSub)document.getElementById('subadmin-sub').textContent=`管理小C：${CU.managedSubC}`;}const ms=document.getElementById('mysubc-sub');if(ms)ms.textContent=CU.subLeader?`目前：${CU.subLeader}`:'尚未設定，點擊選擇';}
 function openChangeName(){document.getElementById('new-name').value=CU.name||'';om('name-modal');setTimeout(()=>document.getElementById('new-name').focus(),350);}
+function openMySubC(){document.getElementById('my-subc').value=CU.subLeader||'';om('subc-modal');setTimeout(()=>document.getElementById('my-subc').focus(),350);}
+async function saveMySubC(){const v=document.getElementById('my-subc').value.trim();CU.subLeader=v;
+  // 若自己原是小C管理者且改了小C，同步管理範圍
+  if(CU.role==='subadmin'&&CU.managedSubC&&CU.managedSubC!==v){CU.managedSubC=v||'';if(!v)CU.role='member';}
+  await saveUser();cm('subc-modal');renderSet();toast('小C 已更新','tg');}
 async function saveName(){const n=document.getElementById('new-name').value.trim();if(!n)return;CU.name=n;await saveUser();cm('name-modal');renderSet();renderHome();toast('姓名已更新','tg');}
 function openChangePass(target){passTarget=target;document.getElementById('pass-modal-title').textContent=target==='admin'?'修改管理員密碼':'修改密碼';document.getElementById('new-pass').value='';document.getElementById('new-pass2').value='';om('pass-modal');setTimeout(()=>document.getElementById('new-pass').focus(),350);}
 async function savePass(){const p1=document.getElementById('new-pass').value.trim(),p2=document.getElementById('new-pass2').value.trim();if(!p1||!p2){toast('請填寫兩次密碼','tr');return;}if(p1!==p2){toast('兩次密碼不一致','tr');return;}if(p1.length<4){toast('密碼至少 4 碼','tr');return;}if(passTarget==='admin'){const{doc,updateDoc}=window.FB;await updateDoc(doc(window.db,'admins',ADMIN_UN),{password:p1});cm('pass-modal');toast('管理員密碼已更新','tg');}else{CU.password=p1;await saveUser();cm('pass-modal');toast('密碼已更新','tg');}}
@@ -1095,11 +1119,50 @@ function renderAdminContent(byL,filter,sub){
   const grpLabel=sub?'小C':'大C';
   document.getElementById('admin-content').innerHTML=teams.length?teams.map(leader=>{const users=byL[leader]||[],done=users.filter(u=>u.days&&u.days[today]&&u.days[today].completed).length;return`<div class="ats"><div class="ath"><div class="atn">👥 ${grpLabel}：${esc(leader)}</div><div style="display:flex;gap:6px;flex-wrap:wrap"><span class="pill purple">${users.length}人</span><span class="pill green">${done}達標</span></div></div>${users.map(u=>{const ch=CHARS[u.charId]||CHARS.resonator,d=u.days&&u.days[today],p3=d?(d.actions||[]).filter(a=>a.type===3&&a.done).length:0,p1=d?(d.actions||[]).filter(a=>a.type===1&&a.done).length:0,p2=d?(d.actions||[]).filter(a=>a.type===2&&a.done).length:0;const subTag=u.role==='subadmin'?` <span class="pill purple" style="font-size:.5rem">小C管理</span>`:'';
   // 主管理者：帳本+指定小C管理+重置+刪除；小C管理者：只有帳本
-  const btns=sub?`<button class="abtn" style="background:var(--green-dim);border-color:rgba(34,211,122,.3);color:var(--green2)" onclick="openLedgerModal('${u.username}')">📒 帳本</button>`:`<button class="abtn" style="background:var(--green-dim);border-color:rgba(34,211,122,.3);color:var(--green2)" onclick="openLedgerModal('${u.username}')">📒 帳本</button><button class="abtn" style="background:var(--purple-dim);border-color:rgba(176,110,255,.3);color:var(--purple2)" onclick="openManageSub('${u.username}','${esc(u.name)}')">🛡️ 小C權限</button><button class="abtn reset" onclick="adminReset('${u.username}','${esc(u.name)}')">重置XP</button><button class="abtn del" onclick="adminDel('${u.username}','${esc(u.name)}')">刪除</button>`;
+  const btns=sub?`<button class="abtn" style="background:var(--green-dim);border-color:rgba(34,211,122,.3);color:var(--green2)" onclick="openLedgerModal('${u.username}')">📒 帳本</button>`:`<button class="abtn" style="background:var(--green-dim);border-color:rgba(34,211,122,.3);color:var(--green2)" onclick="openLedgerModal('${u.username}')">📒 帳本</button><button class="abtn" style="background:var(--blue-dim);border-color:rgba(96,165,250,.3);color:var(--blue)" onclick="openEditGrp('${u.username}')">✏️ 編輯</button><button class="abtn" style="background:var(--purple-dim);border-color:rgba(176,110,255,.3);color:var(--purple2)" onclick="openManageSub('${u.username}','${esc(u.name)}')">🛡️ 小C權限</button><button class="abtn reset" onclick="adminReset('${u.username}','${esc(u.name)}')">重置XP</button><button class="abtn del" onclick="adminDel('${u.username}','${esc(u.name)}')">刪除</button>`;
   return`<div class="aur"><div style="font-size:1.4rem;flex-shrink:0">${ch.emoji}</div><div class="auri"><div class="aurna">${esc(u.name)} <span style="font-size:.6rem;color:var(--muted2);font-weight:400">${u.username}</span>${subTag}</div><div class="aursu">${esc(u.region||'')} · Lv.${u.level||1} · ${u.xp||0}XP · ${d&&d.completed?'✅今日達標':`⏳ ${p3}-${p1}-${p2}`}${!sub&&u.subLeader?` · 小C：${esc(u.subLeader)}`:''}<br>加入：${(u.createdAt||'').slice(0,10)}</div></div><div class="auba">${btns}</div></div>`;}).join('')}</div>`;}).join(''):'<div style="color:var(--muted);font-size:.85rem;padding:20px 0;text-align:center">尚無用戶資料</div>';
 }
 function adminReset(username,name){showCf(`重置 ${name} 的 XP`,`確定要重置「${name}」的等級和 XP 嗎？行動記錄會保留。`,async()=>{const{doc,updateDoc}=window.FB;await updateDoc(doc(window.db,'users',username),{xp:0,level:1,timeline:[]});toast(`已重置 ${name} 的 XP`,'tb');renderAdmin();});}
 function adminDel(username,name){showCf(`刪除用戶 ${name}`,`確定要永久刪除「${name}」的所有資料嗎？此動作無法還原！`,async()=>{const{doc,deleteDoc}=window.FB;await deleteDoc(doc(window.db,'users',username));toast(`已刪除 ${name}`,'tr');renderAdmin();});}
+/* 編輯店主分組（僅主管理者）：地區/大C/小C */
+let egUser=null;
+function allUsersFlat(){return window._abl?Object.values(window._abl).flat():[];}
+function openEditGrp(username){
+  const u=allUsersFlat().find(x=>x.username===username);if(!u)return;
+  egUser=u;
+  document.getElementById('eg-title').textContent=`編輯 ${u.name} 的分組`;
+  document.getElementById('eg-region').value=u.region||'';
+  document.getElementById('eg-subleader').value=u.subLeader||'';
+  // 大C下拉：現有所有大C + 新增選項
+  const leaders=[...new Set(allUsersFlat().map(x=>x.leader).filter(Boolean))].sort();
+  const cur=u.leader||'';
+  if(cur&&!leaders.includes(cur))leaders.push(cur);
+  const sel=document.getElementById('eg-leader-sel');
+  sel.innerHTML=leaders.map(l=>`<option value="${esc(l)}"${l===cur?' selected':''}>${esc(l)}</option>`).join('')+`<option value="__new__">＋ 新增大C</option>`;
+  document.getElementById('eg-leader-new').style.display='none';
+  document.getElementById('eg-leader-new').value='';
+  om('edit-grp-modal');
+}
+function egLeaderSel(){const isNew=document.getElementById('eg-leader-sel').value==='__new__';const ni=document.getElementById('eg-leader-new');ni.style.display=isNew?'block':'none';if(isNew)setTimeout(()=>ni.focus(),50);}
+async function saveGrp(){
+  if(!egUser)return;
+  const region=document.getElementById('eg-region').value.trim();
+  let leader=document.getElementById('eg-leader-sel').value;
+  if(leader==='__new__')leader=document.getElementById('eg-leader-new').value.trim();
+  const subLeader=document.getElementById('eg-subleader').value.trim();
+  if(!region){toast('請填寫地區','tr');return;}
+  if(!leader){toast('請選擇或輸入大C','tr');return;}
+  const{doc,updateDoc}=window.FB;
+  const patch={region,leader,subLeader};
+  // 若此人是小C管理者，且小C被改名/清空，同步調整其管理權，避免管到不存在的組
+  if(egUser.role==='subadmin'&&egUser.managedSubC&&egUser.managedSubC!==subLeader){
+    patch.managedSubC=subLeader||'';
+    if(!subLeader)patch.role='member';
+  }
+  await updateDoc(doc(window.db,'users',egUser.username),patch);
+  toast(`✓ 已更新 ${egUser.name} 的分組`,'tg');
+  cm('edit-grp-modal');renderAdmin();
+}
 /* 指定小C管理者（僅主管理者） */
 function openManageSub(username,name){
   const u=(window._abl?Object.values(window._abl).flat():[]).find(x=>x.username===username);if(!u)return;
