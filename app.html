@@ -222,6 +222,8 @@ nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-w
 /* TYPE CHIPS */
 .trow{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:14px}
 .tc{padding:10px 4px;border-radius:var(--r-sm);border:1px solid var(--border);background:rgba(255,255,255,.02);text-align:center;cursor:pointer;transition:all .2s}
+.care-chip.on{background:var(--green-dim);border-color:rgba(34,211,122,.4)}
+.care-chip:not(.on){opacity:.4}
 .tci{font-size:1.1rem;margin-bottom:4px}.tcl{font-size:.62rem;color:var(--muted2)}
 .tc3{border-color:var(--gold);background:var(--gold-dim)}.tc3 .tcl{color:var(--gold2)}
 .tc1{border-color:var(--blue);background:var(--blue-dim)}.tc1 .tcl{color:var(--blue)}
@@ -376,7 +378,14 @@ nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-w
           <div class="brw"><div class="brl">曝光 ×1</div><div class="brt"><div class="brf" id="b1" style="background:linear-gradient(90deg,var(--blue),var(--cyan))"></div></div><div class="brv" id="bv1">0%</div></div>
           <div class="brw" style="margin-bottom:0"><div class="brl">跟進 ×2</div><div class="brt"><div class="brf" id="b2" style="background:linear-gradient(90deg,var(--purple),var(--purple2))"></div></div><div class="brv" id="bv2">0%</div></div>
         </div>
+        <div class="lbl" style="margin-top:4px">🔔 待關懷顧客</div>
+        <div id="care-list" style="margin-bottom:10px"></div>
         <div class="lbl" style="margin-top:4px">💰 零售帳本</div>
+        <div class="atr" id="ledger-tabs" style="margin-bottom:10px">
+          <div class="at active" id="lgt-week" onclick="setLedger('week')">本週</div>
+          <div class="at" id="lgt-month" onclick="setLedger('month')">本月</div>
+          <div class="at" id="lgt-all" onclick="setLedger('all')">全部</div>
+        </div>
         <div class="card" id="ledger-sum"></div>
         <div id="ledger-list" style="margin-bottom:10px"></div>
         <div class="lbl" style="margin-top:4px">成長里程碑</div>
@@ -416,7 +425,7 @@ nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-w
         <div class="setr" onclick="exportData()"><div class="seti">📤</div><div class="setii"><div class="setn">匯出我的記錄</div><div class="sets">下載 JSON 備份</div></div><div style="color:var(--muted);font-size:.8rem">›</div></div>
         <div class="setr" onclick="doLogout()"><div class="seti">🚪</div><div class="setii"><div class="setn">登出</div><div class="sets">返回登入頁面</div></div><div style="color:var(--muted);font-size:.8rem">›</div></div>
         <div class="card" style="text-align:center;margin-top:4px;padding:24px">
-          <div style="font-family:var(--orb);font-size:1.1rem;background:linear-gradient(135deg,var(--gold),var(--purple2));-webkit-background-clip:text;-webkit-text-fill-color:transparent">3-1-2 DMO v3.3</div>
+          <div style="font-family:var(--orb);font-size:1.1rem;background:linear-gradient(135deg,var(--gold),var(--purple2));-webkit-background-clip:text;-webkit-text-fill-color:transparent">3-1-2 DMO v3.4</div>
           <div style="font-size:.66rem;color:var(--muted);margin-top:10px;line-height:1.8">成功不是靠爆發，而是靠每天重複簡單動作<br><span style="color:var(--gold)">流量</span> · <span style="color:var(--blue)">曝光</span> · <span style="color:var(--purple)">跟進</span></div>
         </div>
       </div>
@@ -427,6 +436,9 @@ nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-w
         <div style="padding-top:8px;margin-bottom:4px;display:flex;align-items:center;gap:10px"><div style="font-family:var(--orb);font-size:1.2rem;color:var(--red)">管理後台</div><span class="pill red">ADMIN</span></div>
         <div style="font-size:.7rem;color:var(--muted2);margin-bottom:16px">登入者：<span id="admin-lbl"></span></div>
         <div class="aov" id="admin-overview"></div>
+        <div class="lbl" style="margin-top:8px;display:flex;justify-content:space-between;align-items:center">💰 團隊銷售彙總 <button class="abtn" style="background:var(--gold-dim);border-color:rgba(245,200,66,.3);color:var(--gold2)" onclick="exportAllCsv()">📥 下載全團隊 CSV</button></div>
+        <div id="sales-summary" style="margin-bottom:8px"></div>
+        <div class="lbl">店主管理</div>
         <div class="atr" id="admin-tabs"></div>
         <div id="admin-content"></div>
         <div class="lbl" style="margin-top:8px">管理員操作</div>
@@ -487,7 +499,14 @@ nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-w
     <div style="display:flex;gap:8px"><div style="flex:1"><div class="il">成交價 *</div><input class="inp" id="s-price" type="number" inputmode="decimal" placeholder="1500" oninput="calcProfit()"></div><div style="flex:1"><div class="il">成本 *</div><input class="inp" id="s-cost" type="number" inputmode="decimal" placeholder="1100" oninput="calcProfit()"></div></div>
     <div style="display:flex;gap:8px"><div style="flex:1"><div class="il">BV 分數 *</div><input class="inp" id="s-bv" type="number" inputmode="decimal" placeholder="25"></div><div style="flex:1"><div class="il">IBV 分數</div><input class="inp" id="s-ibv" type="number" inputmode="decimal" placeholder="選填"></div></div>
     <div class="il">顧客（選填）</div><input class="inp" id="s-cust" placeholder="例：王小姐" maxlength="20">
-    <div style="display:flex;gap:8px"><div style="flex:1"><div class="il">售出日期</div><input class="inp" id="s-date" type="date" style="color-scheme:dark"></div><div style="flex:1"><div class="il">關懷提醒日（選填）</div><input class="inp" id="s-care" type="date" style="color-scheme:dark"></div></div>
+    <div class="il">售出日期</div><input class="inp" id="s-date" type="date" style="color-scheme:dark" onchange="renderCarePreview()">
+    <div class="il">顧客關懷提醒（可複選）</div>
+    <div class="trow" id="care-chips" style="grid-template-columns:repeat(3,1fr)">
+      <div class="tc care-chip on" data-d="7" onclick="toggleCare(7)"><div class="tci">📞</div><div class="tcl">7天</div></div>
+      <div class="tc care-chip on" data-d="14" onclick="toggleCare(14)"><div class="tci">💬</div><div class="tcl">14天</div></div>
+      <div class="tc care-chip on" data-d="30" onclick="toggleCare(30)"><div class="tci">🔄</div><div class="tcl">30天</div></div>
+    </div>
+    <div id="care-preview" style="font-size:.64rem;color:var(--muted2);line-height:1.7;margin-bottom:12px"></div>
     <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:var(--green-dim);border:1px solid rgba(34,211,122,.2);border-radius:var(--r-sm);margin-bottom:14px"><span style="font-size:.75rem;color:var(--muted2)">零售利潤（成交價−成本）</span><span style="font-family:var(--orb);font-size:1.1rem;color:var(--green2)" id="s-profit">$0</span></div>
     <div class="mr"><button class="btn btn-danger" id="s-del" style="width:auto;padding:12px 20px;display:none" onclick="delSaleCf()">刪除</button><button class="btn btn-ghost" style="width:auto;padding:12px 20px" onclick="cm('sale-modal')">取消</button><button class="btn btn-gold" onclick="saveSale()">儲存 ✓</button></div>
   </div>
@@ -507,6 +526,12 @@ nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-w
     <div class="il">內容預覽（可直接修改）</div>
     <textarea class="inp" id="copy-text" rows="9" style="resize:vertical;line-height:1.7;font-size:.84rem"></textarea>
     <div class="mr"><button class="btn btn-ghost" style="width:auto;padding:12px 20px" onclick="cm('copy-modal')">取消</button><button class="btn btn-gold" onclick="copyReport()">📋 複製到剪貼簿</button></div>
+  </div>
+</div>
+<div class="mb" id="led-modal" onclick="cmc('led-modal',event)">
+  <div class="ms" style="max-height:85vh;overflow-y:auto"><div class="mh"></div><div class="mt" id="led-title">店主帳本</div>
+    <div id="led-body"></div>
+    <div class="mr"><button class="btn btn-ghost" style="width:auto;padding:12px 20px" onclick="cm('led-modal')">關閉</button><button class="btn btn-gold" id="led-csv-btn" onclick="exportOneCsv()">📥 下載此人 CSV</button></div>
   </div>
 </div>
 <div class="cfb" id="cf-bg">
@@ -811,9 +836,17 @@ function renderRetail(){
   const bar=(label,val,goal,col,money)=>{const vT=money?'$'+fmtMoney(val):val,gT=money?'$'+fmtMoney(goal):goal;if(goal>0){const pct=Math.min(100,Math.round(val/goal*100));return`<div style="margin-bottom:8px"><div class="xpr"><span>${label}</span><span>${vT} / ${gT}（${pct}%）</span></div><div class="xpt" style="height:8px"><div class="xpb" style="width:${pct}%;background:linear-gradient(90deg,${col},${col}aa)"></div></div></div>`;}return`<div style="display:flex;justify-content:space-between;font-size:.74rem;color:var(--muted2);margin-bottom:6px;font-family:var(--mono)"><span>${label}</span><span style="color:${col}">${vT}</span></div>`;};
   el.innerHTML=`<div class="card" style="margin-bottom:6px">${bar('本週利潤',wp,+g.income||0,'var(--green2)',true)}${bar('本週 BV',wb,+g.bv||0,'var(--gold)',false)}${(+g.ibv||wi)?bar('本週 IBV',wi,+g.ibv||0,'var(--blue)',false):''}<div style="font-size:.62rem;color:var(--muted);margin-top:2px">本週 ${ws.length} 筆${(+g.bv||+g.ibv||+g.income)?'':' · 到「設定」訂每週目標可拿達標獎勵'}</div></div>`;
 }
+let careSel=[7,14,30];
+function addDays(dstr,n){const d=new Date(dstr+'T00:00:00');d.setDate(d.getDate()+n);return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
+function toggleCare(d){const i=careSel.indexOf(d);if(i>=0)careSel.splice(i,1);else careSel.push(d);document.querySelectorAll('#care-chips .care-chip').forEach(c=>c.classList.toggle('on',careSel.includes(+c.dataset.d)));renderCarePreview();}
+function renderCarePreview(){const el=document.getElementById('care-preview');if(!el)return;const base=document.getElementById('s-date').value||dk();if(!careSel.length){el.innerHTML='未設定關懷提醒';return;}el.innerHTML='將提醒關懷：'+careSel.slice().sort((a,b)=>a-b).map(d=>`<span style="color:var(--green2)">${addDays(base,d)}（${d}天）</span>`).join('、');}
+function careDatesOf(s){if(Array.isArray(s.careDates)&&s.careDates.length)return s.careDates;if(Array.isArray(s.careDays)&&s.date)return s.careDays.map(d=>addDays(s.date,d));if(s.careDate)return[s.careDate];return[];}
+// 取得所有待關懷項目（未來或已過期、且未標記完成）
+function pendingCares(){const out=[];const todayK=dk();retail().sales.forEach(s=>{const done=s.careDone||{};careDatesOf(s).forEach((cd,i)=>{if(done[i])return;out.push({sid:s.id,idx:i,date:cd,item:s.item,customer:s.customer||'',overdue:cd<todayK,today:cd===todayK});});});return out.sort((a,b)=>a.date.localeCompare(b.date));}
+async function markCareDone(sid,idx){const s=retail().sales.find(x=>x.id===sid);if(!s)return;if(!s.careDone)s.careDone={};s.careDone[idx]=true;await saveUser();renderStats();toast('✓ 已完成關懷','tg');}
 function openSale(sid){
   editSid=sid||null;
-  const r=retail();let s={item:'',price:'',cost:'',bv:'',ibv:'',customer:'',date:dk(),careDate:''};
+  const r=retail();let s={item:'',price:'',cost:'',bv:'',ibv:'',customer:'',date:dk(),careDays:[7,14,30]};
   if(sid){const f=r.sales.find(x=>x.id===sid);if(f)s={...f};}
   document.getElementById('sale-title').textContent=sid?'編輯銷售':'記錄銷售';
   document.getElementById('s-item').value=s.item||'';
@@ -823,7 +856,9 @@ function openSale(sid){
   document.getElementById('s-ibv').value=s.ibv??'';
   document.getElementById('s-cust').value=s.customer||'';
   document.getElementById('s-date').value=s.date||dk();
-  document.getElementById('s-care').value=s.careDate||'';
+  careSel=Array.isArray(s.careDays)?s.careDays.slice():(s.careDate?[]:[7,14,30]);
+  document.querySelectorAll('#care-chips .care-chip').forEach(c=>c.classList.toggle('on',careSel.includes(+c.dataset.d)));
+  renderCarePreview();
   document.getElementById('s-del').style.display=sid?'block':'none';
   calcProfit();om('sale-modal');
   if(!sid)setTimeout(()=>document.getElementById('s-item').focus(),350);
@@ -840,16 +875,18 @@ async function saveSale(){
   const ibv=document.getElementById('s-ibv').value===''?0:+document.getElementById('s-ibv').value;
   const customer=document.getElementById('s-cust').value.trim();
   const date=document.getElementById('s-date').value||dk();
-  const careDate=document.getElementById('s-care').value||'';
+  const careDays=careSel.slice().sort((a,b)=>a-b);
+  const careDates=careDays.map(d=>addDays(date,d));
   const r=retail();
   if(editSid){
     const s=r.sales.find(x=>x.id===editSid);if(!s)return;
     const oldBV=+s.bv||0;
-    Object.assign(s,{item,price,cost,bv,ibv,customer,date,careDate});
+    Object.assign(s,{item,price,cost,bv,ibv,customer,date,careDays,careDates});
+    delete s.careDate;
     CU.xp=Math.max(0,(CU.xp||0)+(bv-oldBV));
     toast('✓ 銷售已更新','tg');
   }else{
-    r.sales.push({id:uid(),item,price,cost,bv,ibv,customer,date,careDate,ts:Date.now()});
+    r.sales.push({id:uid(),item,price,cost,bv,ibv,customer,date,careDays,careDates,careDone:{},ts:Date.now()});
     CU.xp=(CU.xp||0)+bv;
     addTL('💰',`賣出 ${item}，利潤 $${fmtMoney(price-cost)}`);
     toast(`✓ 已記錄銷售 +${bv}XP`,'tg');snd('check');
@@ -881,12 +918,24 @@ function checkWeekGoal(){
 }
 function openGoal(){const g=retail().weeklyGoal||{};document.getElementById('g-bv').value=g.bv||'';document.getElementById('g-ibv').value=g.ibv||'';document.getElementById('g-income').value=g.income||'';om('goal-modal');}
 async function saveGoal(){const r=retail();r.weeklyGoal={bv:+document.getElementById('g-bv').value||0,ibv:+document.getElementById('g-ibv').value||0,income:+document.getElementById('g-income').value||0};checkWeekGoal();await saveUser();cm('goal-modal');renderSet();renderRetail();toast('週目標已更新','tg');}
+let ledgerMode='week';
+function setLedger(m){ledgerMode=m;['week','month','all'].forEach(x=>{const t=document.getElementById('lgt-'+x);if(t)t.classList.toggle('active',x===m);});renderLedger();}
+function renderCareList(){
+  const el=document.getElementById('care-list');if(!el)return;
+  const todayK=dk(),pend=pendingCares().filter(c=>c.date<=addDays(todayK,3));// 顯示已到期+3天內
+  if(!pend.length){el.innerHTML='<div class="card" style="text-align:center;color:var(--muted);font-size:.78rem;padding:14px">目前沒有待關懷的顧客 👍</div>';return;}
+  el.innerHTML=pend.slice(0,10).map(c=>{const tag=c.overdue?'<span style="color:var(--red)">已到期</span>':c.today?'<span style="color:var(--gold)">今天</span>':`<span style="color:var(--blue)">${c.date}</span>`;return`<div class="ai" style="border-color:${c.overdue?'rgba(255,68,102,.3)':c.today?'rgba(245,200,66,.3)':'var(--border)'}"><div class="ab"><div class="an">🔔 ${esc(c.item)}${c.customer?` → ${esc(c.customer)}`:''}</div><div class="ano">關懷日 ${esc(c.date)} · ${tag}</div></div><button class="aed" style="background:var(--green-dim);border-color:rgba(34,211,122,.3);color:var(--green2)" onclick="markCareDone('${c.sid}',${c.idx})">✓ 已關懷</button></div>`;}).join('');
+}
+function ledgerFilter(all){if(ledgerMode==='all')return all;const from=ledgerMode==='month'?periodFrom('month'):mondayOf(new Date());return all.filter(s=>(s.date||'')>=from);}
 function renderLedger(){
+  renderCareList();
   const sEl=document.getElementById('ledger-sum'),lEl=document.getElementById('ledger-list');if(!sEl)return;
-  const all=[...retail().sales].sort((a,b)=>(b.date||'').localeCompare(a.date||'')||((b.ts||0)-(a.ts||0)));
-  const tp=sumProfit(all),tb=sumBV(all);
-  sEl.innerHTML=`<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center"><div><div style="font-family:var(--orb);font-size:1.1rem;color:var(--green2)">$${fmtMoney(tp)}</div><div style="font-size:.56rem;color:var(--muted2)">累積利潤</div></div><div><div style="font-family:var(--orb);font-size:1.1rem;color:var(--gold)">${fmtMoney(tb)}</div><div style="font-size:.56rem;color:var(--muted2)">累積 BV</div></div><div><div style="font-family:var(--orb);font-size:1.1rem;color:var(--blue)">${all.length}</div><div style="font-size:.56rem;color:var(--muted2)">銷售筆數</div></div></div>`;
-  lEl.innerHTML=all.slice(0,15).map(s=>`<div class="ai"><div class="ab"><div class="an">💰 ${esc(s.item)}${s.customer?` <span style="font-size:.64rem;color:var(--muted2)">→ ${esc(s.customer)}</span>`:''}</div><div class="ano">${esc(s.date||'')} · BV ${+s.bv||0}${+s.ibv?` · IBV ${+s.ibv}`:''}${s.careDate?` · 🔔 ${esc(s.careDate)} 關懷`:''}</div></div><div class="axp" style="color:${profitOf(s)>=0?'var(--green2)':'var(--red)'};background:var(--green-dim);border-color:rgba(34,211,122,.15)">$${fmtMoney(profitOf(s))}</div><button class="aed" onclick="openSale('${s.id}')">編輯</button></div>`).join('')||'<div class="card" style="text-align:center;color:var(--muted);font-size:.82rem;padding:18px">尚無銷售記錄，到「今日」頁記下第一筆吧！</div>';
+  const allSorted=[...retail().sales].sort((a,b)=>(b.date||'').localeCompare(a.date||'')||((b.ts||0)-(a.ts||0)));
+  const list=ledgerFilter(allSorted);
+  const tp=sumProfit(list),tb=sumBV(list),ti=sumIBV(list);
+  const lbl=ledgerMode==='week'?'本週':ledgerMode==='month'?'本月':'全部';
+  sEl.innerHTML=`<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;text-align:center"><div><div style="font-family:var(--orb);font-size:1rem;color:var(--green2)">$${fmtMoney(tp)}</div><div style="font-size:.54rem;color:var(--muted2)">${lbl}利潤</div></div><div><div style="font-family:var(--orb);font-size:1rem;color:var(--gold)">${fmtMoney(tb)}</div><div style="font-size:.54rem;color:var(--muted2)">${lbl} BV</div></div><div><div style="font-family:var(--orb);font-size:1rem;color:var(--blue)">${fmtMoney(ti)}</div><div style="font-size:.54rem;color:var(--muted2)">${lbl} IBV</div></div><div><div style="font-family:var(--orb);font-size:1rem;color:var(--purple2)">${list.length}</div><div style="font-size:.54rem;color:var(--muted2)">筆數</div></div></div>`;
+  lEl.innerHTML=list.slice(0,30).map(s=>`<div class="ai"><div class="ab"><div class="an">💰 ${esc(s.item)}${s.customer?` <span style="font-size:.64rem;color:var(--muted2)">→ ${esc(s.customer)}</span>`:''}</div><div class="ano">${esc(s.date||'')} · BV ${+s.bv||0}${+s.ibv?` · IBV ${+s.ibv}`:''}${careDatesOf(s).length?` · 🔔 ${careDatesOf(s).length} 次關懷`:''}</div></div><div class="axp" style="color:${profitOf(s)>=0?'var(--green2)':'var(--red)'};background:var(--green-dim);border-color:rgba(34,211,122,.15)">$${fmtMoney(profitOf(s))}</div><button class="aed" onclick="openSale('${s.id}')">編輯</button></div>`).join('')||`<div class="card" style="text-align:center;color:var(--muted);font-size:.82rem;padding:18px">${ledgerMode==='all'?'尚無銷售記錄，到「今日」頁記下第一筆吧！':'這個期間還沒有銷售記錄'}</div>`;
 }
 /* COPY REPORT */
 function openCopy(){document.getElementById('copy-rec').value=retail().recommend||'';buildCopy();om('copy-modal');}
@@ -1014,14 +1063,43 @@ async function renderAdmin(){
   window._abl=byL;
   document.getElementById('admin-tabs').innerHTML=['ALL',...teams].map(t=>`<div class="at ${t===adminAT?'active':''}" onclick="setAT('${t}')">${t==='ALL'?'全部':t}</div>`).join('');
   renderAdminContent(byL,adminAT==='ALL'?null:adminAT);
+  renderSalesSummary();
 }
 function setAT(team){adminAT=team;document.querySelectorAll('.at').forEach(t=>t.classList.toggle('active',t.textContent===(team==='ALL'?'全部':team)));renderAdminContent(window._abl,team==='ALL'?null:team);}
 function renderAdminContent(byL,filter){
   const teams=filter?[filter]:Object.keys(byL).sort();const today=dk();
-  document.getElementById('admin-content').innerHTML=teams.length?teams.map(leader=>{const users=byL[leader]||[],done=users.filter(u=>u.days&&u.days[today]&&u.days[today].completed).length;return`<div class="ats"><div class="ath"><div class="atn">👥 大C：${leader}</div><div style="display:flex;gap:6px;flex-wrap:wrap"><span class="pill purple">${users.length}人</span><span class="pill green">${done}達標</span></div></div>${users.map(u=>{const ch=CHARS[u.charId]||CHARS.resonator,d=u.days&&u.days[today],p3=d?(d.actions||[]).filter(a=>a.type===3&&a.done).length:0,p1=d?(d.actions||[]).filter(a=>a.type===1&&a.done).length:0,p2=d?(d.actions||[]).filter(a=>a.type===2&&a.done).length:0;return`<div class="aur"><div style="font-size:1.4rem;flex-shrink:0">${ch.emoji}</div><div class="auri"><div class="aurna">${esc(u.name)} <span style="font-size:.6rem;color:var(--muted2);font-weight:400">${u.username}</span></div><div class="aursu">${u.region} · Lv.${u.level||1} · ${u.xp||0}XP · ${d&&d.completed?'✅今日達標':`⏳ ${p3}-${p1}-${p2}`}<br>加入：${(u.createdAt||'').slice(0,10)}</div></div><div class="auba"><button class="abtn reset" onclick="adminReset('${u.username}','${esc(u.name)}')">重置XP</button><button class="abtn del" onclick="adminDel('${u.username}','${esc(u.name)}')">刪除</button></div></div>`;}).join('')}</div>`;}).join(''):'<div style="color:var(--muted);font-size:.85rem;padding:20px 0;text-align:center">尚無用戶資料</div>';
+  document.getElementById('admin-content').innerHTML=teams.length?teams.map(leader=>{const users=byL[leader]||[],done=users.filter(u=>u.days&&u.days[today]&&u.days[today].completed).length;return`<div class="ats"><div class="ath"><div class="atn">👥 大C：${leader}</div><div style="display:flex;gap:6px;flex-wrap:wrap"><span class="pill purple">${users.length}人</span><span class="pill green">${done}達標</span></div></div>${users.map(u=>{const ch=CHARS[u.charId]||CHARS.resonator,d=u.days&&u.days[today],p3=d?(d.actions||[]).filter(a=>a.type===3&&a.done).length:0,p1=d?(d.actions||[]).filter(a=>a.type===1&&a.done).length:0,p2=d?(d.actions||[]).filter(a=>a.type===2&&a.done).length:0;return`<div class="aur"><div style="font-size:1.4rem;flex-shrink:0">${ch.emoji}</div><div class="auri"><div class="aurna">${esc(u.name)} <span style="font-size:.6rem;color:var(--muted2);font-weight:400">${u.username}</span></div><div class="aursu">${u.region} · Lv.${u.level||1} · ${u.xp||0}XP · ${d&&d.completed?'✅今日達標':`⏳ ${p3}-${p1}-${p2}`}<br>加入：${(u.createdAt||'').slice(0,10)}</div></div><div class="auba"><button class="abtn" style="background:var(--green-dim);border-color:rgba(34,211,122,.3);color:var(--green2)" onclick="openLedgerModal('${u.username}')">📒 帳本</button><button class="abtn reset" onclick="adminReset('${u.username}','${esc(u.name)}')">重置XP</button><button class="abtn del" onclick="adminDel('${u.username}','${esc(u.name)}')">刪除</button></div></div>`;}).join('')}</div>`;}).join(''):'<div style="color:var(--muted);font-size:.85rem;padding:20px 0;text-align:center">尚無用戶資料</div>';
 }
 function adminReset(username,name){showCf(`重置 ${name} 的 XP`,`確定要重置「${name}」的等級和 XP 嗎？行動記錄會保留。`,async()=>{const{doc,updateDoc}=window.FB;await updateDoc(doc(window.db,'users',username),{xp:0,level:1,timeline:[]});toast(`已重置 ${name} 的 XP`,'tb');renderAdmin();});}
 function adminDel(username,name){showCf(`刪除用戶 ${name}`,`確定要永久刪除「${name}」的所有資料嗎？此動作無法還原！`,async()=>{const{doc,deleteDoc}=window.FB;await deleteDoc(doc(window.db,'users',username));toast(`已刪除 ${name}`,'tr');renderAdmin();});}
+/* ADMIN 帳本（不含顧客姓名） */
+let ledUser=null;
+function openLedgerModal(username){
+  const u=(window._abl?Object.values(window._abl).flat():[]).find(x=>x.username===username);if(!u)return;
+  ledUser=u;
+  const sales=uSales(u),tp=sumProfit(sales),tb=sumBV(sales),ti=sumIBV(sales);
+  document.getElementById('led-title').textContent=`📒 ${u.name} 的帳本`;
+  const sorted=[...sales].sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  document.getElementById('led-body').innerHTML=`<div class="card" style="margin-bottom:10px"><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;text-align:center"><div><div style="font-family:var(--orb);font-size:1rem;color:var(--green2)">$${fmtMoney(tp)}</div><div style="font-size:.54rem;color:var(--muted2)">累積利潤</div></div><div><div style="font-family:var(--orb);font-size:1rem;color:var(--gold)">${fmtMoney(tb)}</div><div style="font-size:.54rem;color:var(--muted2)">累積 BV</div></div><div><div style="font-family:var(--orb);font-size:1rem;color:var(--blue)">${fmtMoney(ti)}</div><div style="font-size:.54rem;color:var(--muted2)">累積 IBV</div></div><div><div style="font-family:var(--orb);font-size:1rem;color:var(--purple2)">${sales.length}</div><div style="font-size:.54rem;color:var(--muted2)">筆數</div></div></div></div>`+
+  (sorted.length?sorted.slice(0,50).map(s=>`<div class="ai"><div class="ab"><div class="an">💰 ${esc(s.item)}</div><div class="ano">${esc(s.date||'')} · 成交$${fmtMoney(s.price)} · 成本$${fmtMoney(s.cost)} · BV ${+s.bv||0}${+s.ibv?` · IBV ${+s.ibv}`:''}</div></div><div class="axp" style="color:var(--green2);background:var(--green-dim);border-color:rgba(34,211,122,.15)">$${fmtMoney(profitOf(s))}</div></div>`).join(''):'<div style="text-align:center;color:var(--muted);font-size:.82rem;padding:18px">此店主尚無銷售記錄</div>');
+  om('led-modal');
+}
+function csvEscape(v){const s=String(v??'');return /[",\n]/.test(s)?`"${s.replace(/"/g,'""')}"`:s;}
+function salesToCsv(rows){const head=['店主','店主帳號','地區','大C','品項','售出日期','成交價','成本','零售利潤','BV','IBV'];const lines=[head.join(',')];rows.forEach(r=>lines.push(r.map(csvEscape).join(',')));return'\ufeff'+lines.join('\n');}// BOM for Excel 中文
+function dlCsv(csv,fname){const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=fname;a.click();URL.revokeObjectURL(url);}
+function userSaleRows(u){return uSales(u).map(s=>[u.name,u.username,u.region||'',u.leader||'',s.item,s.date||'',s.price,s.cost,profitOf(s),+s.bv||0,+s.ibv||0]);}
+function exportOneCsv(){if(!ledUser)return;const rows=userSaleRows(ledUser);if(!rows.length){toast('此店主沒有銷售記錄','to');return;}dlCsv(salesToCsv(rows),`帳本-${ledUser.name}-${dk()}.csv`);toast('已下載 CSV','tg');}
+function exportAllCsv(){const all=window._abl?Object.values(window._abl).flat():[];const rows=[];all.forEach(u=>rows.push(...userSaleRows(u)));if(!rows.length){toast('目前沒有任何銷售記錄','to');return;}dlCsv(salesToCsv(rows),`全團隊銷售總表-${dk()}.csv`);toast(`已下載 ${rows.length} 筆銷售`,'tg');}
+function renderSalesSummary(){
+  const all=window._abl?Object.values(window._abl).flat():[];
+  const rank=all.map(u=>({name:u.name,region:u.region||'',prof:sumProfit(uSales(u)),bv:sumBV(uSales(u)),cnt:uSales(u).length})).filter(x=>x.cnt>0).sort((a,b)=>b.prof-a.prof);
+  const totalProf=rank.reduce((t,x)=>t+x.prof,0),totalCnt=rank.reduce((t,x)=>t+x.cnt,0);
+  const el=document.getElementById('sales-summary');if(!el)return;
+  if(!rank.length){el.innerHTML='<div style="color:var(--muted);font-size:.82rem;padding:14px;text-align:center">尚無銷售資料</div>';return;}
+  const RE=['🥇','🥈','🥉'];
+  el.innerHTML=`<div class="card" style="margin-bottom:10px"><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;text-align:center"><div><div style="font-family:var(--orb);font-size:1.2rem;color:var(--green2)">$${fmtMoney(totalProf)}</div><div style="font-size:.56rem;color:var(--muted2)">團隊總利潤</div></div><div><div style="font-family:var(--orb);font-size:1.2rem;color:var(--purple2)">${totalCnt}</div><div style="font-size:.56rem;color:var(--muted2)">總銷售筆數</div></div></div></div>`+
+  rank.slice(0,20).map((x,i)=>`<div class="lbi"><div class="lbr" style="color:${i===0?'#ffd700':i===1?'#c0c0c0':i===2?'#cd7f32':'var(--muted)'}">${i<3?RE[i]:i+1}</div><div class="lbii" style="margin-left:8px"><div class="lbn">${esc(x.name)} <span style="font-size:.58rem;color:var(--muted2)">${esc(x.region)}</span></div><div class="lbs">BV ${fmtMoney(x.bv)} · ${x.cnt} 筆</div></div><div class="lbx" style="color:var(--green2)">$${fmtMoney(x.prof)}</div></div>`).join('');
+}
 /* PAGE/SCREEN */
 function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('open'));document.getElementById(id).classList.add('open');}
 function hideAllScreens(){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('open'));}
