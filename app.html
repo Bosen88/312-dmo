@@ -337,9 +337,14 @@ nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-w
         <div class="aiw" id="items2"></div>
         <div class="aiw"><button class="addb" onclick="openAdd(2)">＋ 記錄跟進 <span style="color:var(--gold);font-family:var(--mono);font-size:.7rem">+20XP</span></button></div>
       </div>
+      <div class="agw">
+        <div class="agh"><div class="agi" style="background:var(--green-dim);border:1px solid rgba(34,211,122,.2)">💰</div><div class="agii"><div class="agt">零售 — 本週銷售</div><div class="ags">賣出商品・BV 直接變 XP</div></div><div class="agc" id="acR" style="color:var(--green2)">$0</div></div>
+        <div class="aiw" id="retail-week"></div>
+        <div class="aiw"><button class="addb" onclick="openSale()">＋ 記一筆銷售 <span style="color:var(--green2);font-family:var(--mono);font-size:.7rem">BV=XP</span></button></div>
+      </div>
+      <div style="padding:0 16px 4px"><button class="btn btn-gold" onclick="openCopy()">📋 一鍵複製今日戰報</button></div>
       <div style="height:8px"></div>
     </div>
-    <!-- STATS -->
     <div class="page" id="page-stats">
       <div class="sp">
         <div style="padding-top:8px;margin-bottom:16px;font-family:var(--orb);font-size:1.4rem;background:linear-gradient(135deg,var(--gold),var(--purple2));-webkit-background-clip:text;-webkit-text-fill-color:transparent">成長記錄</div>
@@ -371,6 +376,9 @@ nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-w
           <div class="brw"><div class="brl">曝光 ×1</div><div class="brt"><div class="brf" id="b1" style="background:linear-gradient(90deg,var(--blue),var(--cyan))"></div></div><div class="brv" id="bv1">0%</div></div>
           <div class="brw" style="margin-bottom:0"><div class="brl">跟進 ×2</div><div class="brt"><div class="brf" id="b2" style="background:linear-gradient(90deg,var(--purple),var(--purple2))"></div></div><div class="brv" id="bv2">0%</div></div>
         </div>
+        <div class="lbl" style="margin-top:4px">💰 零售帳本</div>
+        <div class="card" id="ledger-sum"></div>
+        <div id="ledger-list" style="margin-bottom:10px"></div>
         <div class="lbl" style="margin-top:4px">成長里程碑</div>
         <div class="card"><div class="tll" id="tl-wrap"></div></div>
         <div class="lbl" style="margin-top:4px">最近記錄</div>
@@ -383,7 +391,12 @@ nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-w
         <div style="padding-top:8px;margin-bottom:4px;font-family:var(--orb);font-size:1.3rem;background:linear-gradient(135deg,var(--purple2),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent">團隊戰況</div>
         <div style="font-size:.72rem;color:var(--muted2);margin-bottom:14px" id="team-lbl">📍 大C：—</div>
         <div class="tsr" id="team-sum"></div>
-        <div class="lbl">本週 XP 排行榜</div>
+        <div class="lbl">團隊排行榜</div>
+        <div class="atr" id="lb-tabs" style="margin-bottom:10px">
+          <div class="at active" id="lbt-all" onclick="setLB('all')">總 XP</div>
+          <div class="at" id="lbt-month" onclick="setLB('month')">本月</div>
+          <div class="at" id="lbt-quarter" onclick="setLB('quarter')">本季</div>
+        </div>
         <div id="leaderboard" style="margin-bottom:16px"></div>
         <div class="lbl">夥伴詳情</div>
         <div id="member-list"></div>
@@ -398,11 +411,12 @@ nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-w
         <div class="setr" onclick="openChangePass('user')"><div class="seti">🔒</div><div class="setii"><div class="setn">修改密碼</div><div class="sets">更換登入密碼</div></div><div style="color:var(--muted);font-size:.8rem">›</div></div>
         <div class="setr" onclick="reQuiz()"><div class="seti">🎮</div><div class="setii"><div class="setn">重新測驗人格</div><div class="sets">換一個角色類型</div></div><div style="color:var(--muted);font-size:.8rem">›</div></div>
         <div class="setr" onclick="reGender()"><div class="seti">👤</div><div class="setii"><div class="setn">更換角色性別</div><div class="sets">切換男性/女性立繪</div></div><div style="color:var(--muted);font-size:.8rem">›</div></div>
+        <div class="setr" onclick="openGoal()"><div class="seti">🎯</div><div class="setii"><div class="setn">每週零售目標</div><div class="sets" id="goal-sub">設定每週 BV / 利潤目標</div></div><div style="color:var(--muted);font-size:.8rem">›</div></div>
         <div class="lbl" style="margin-top:4px">帳號操作</div>
         <div class="setr" onclick="exportData()"><div class="seti">📤</div><div class="setii"><div class="setn">匯出我的記錄</div><div class="sets">下載 JSON 備份</div></div><div style="color:var(--muted);font-size:.8rem">›</div></div>
         <div class="setr" onclick="doLogout()"><div class="seti">🚪</div><div class="setii"><div class="setn">登出</div><div class="sets">返回登入頁面</div></div><div style="color:var(--muted);font-size:.8rem">›</div></div>
         <div class="card" style="text-align:center;margin-top:4px;padding:24px">
-          <div style="font-family:var(--orb);font-size:1.1rem;background:linear-gradient(135deg,var(--gold),var(--purple2));-webkit-background-clip:text;-webkit-text-fill-color:transparent">3-1-2 DMO v3.0</div>
+          <div style="font-family:var(--orb);font-size:1.1rem;background:linear-gradient(135deg,var(--gold),var(--purple2));-webkit-background-clip:text;-webkit-text-fill-color:transparent">3-1-2 DMO v3.1</div>
           <div style="font-size:.66rem;color:var(--muted);margin-top:10px;line-height:1.8">成功不是靠爆發，而是靠每天重複簡單動作<br><span style="color:var(--gold)">流量</span> · <span style="color:var(--blue)">曝光</span> · <span style="color:var(--purple)">跟進</span></div>
         </div>
       </div>
@@ -467,6 +481,33 @@ nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-w
     <div class="mr"><button class="btn btn-ghost" style="width:auto;padding:12px 20px" onclick="cm('pass-modal')">取消</button><button class="btn btn-gold" onclick="savePass()">儲存</button></div>
   </div>
 </div>
+<div class="mb" id="sale-modal" onclick="cmc('sale-modal',event)">
+  <div class="ms"><div class="mh"></div><div class="mt" id="sale-title">記錄銷售</div>
+    <div class="il">品項 *</div><input class="inp" id="s-item" placeholder="例：OPC-3、魚油" maxlength="30">
+    <div style="display:flex;gap:8px"><div style="flex:1"><div class="il">成交價 *</div><input class="inp" id="s-price" type="number" inputmode="decimal" placeholder="1500" oninput="calcProfit()"></div><div style="flex:1"><div class="il">成本 *</div><input class="inp" id="s-cost" type="number" inputmode="decimal" placeholder="1100" oninput="calcProfit()"></div></div>
+    <div style="display:flex;gap:8px"><div style="flex:1"><div class="il">BV 分數 *</div><input class="inp" id="s-bv" type="number" inputmode="decimal" placeholder="25"></div><div style="flex:1"><div class="il">零售價（參考）</div><input class="inp" id="s-srp" type="number" inputmode="decimal" placeholder="選填"></div></div>
+    <div class="il">顧客（選填）</div><input class="inp" id="s-cust" placeholder="例：王小姐" maxlength="20">
+    <div style="display:flex;gap:8px"><div style="flex:1"><div class="il">售出日期</div><input class="inp" id="s-date" type="date" style="color-scheme:dark"></div><div style="flex:1"><div class="il">關懷提醒日（選填）</div><input class="inp" id="s-care" type="date" style="color-scheme:dark"></div></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:var(--green-dim);border:1px solid rgba(34,211,122,.2);border-radius:var(--r-sm);margin-bottom:14px"><span style="font-size:.75rem;color:var(--muted2)">零售利潤（成交價−成本）</span><span style="font-family:var(--orb);font-size:1.1rem;color:var(--green2)" id="s-profit">$0</span></div>
+    <div class="mr"><button class="btn btn-danger" id="s-del" style="width:auto;padding:12px 20px;display:none" onclick="delSaleCf()">刪除</button><button class="btn btn-ghost" style="width:auto;padding:12px 20px" onclick="cm('sale-modal')">取消</button><button class="btn btn-gold" onclick="saveSale()">儲存 ✓</button></div>
+  </div>
+</div>
+<div class="mb" id="goal-modal" onclick="cmc('goal-modal',event)">
+  <div class="ms"><div class="mh"></div><div class="mt">每週零售目標</div>
+    <div class="il">每週 BV 目標</div><input class="inp" id="g-bv" type="number" inputmode="numeric" placeholder="例：100（填 0 表示不設定）">
+    <div class="il">每週利潤目標（元）</div><input class="inp" id="g-income" type="number" inputmode="numeric" placeholder="例：3000（填 0 表示不設定）">
+    <div style="font-size:.68rem;color:var(--muted2);line-height:1.6;margin-bottom:14px">💡 週一重新計算，設定的目標全部達成時獲得 <span style="color:var(--gold)">+50 XP</span> 獎勵（每週一次）</div>
+    <div class="mr"><button class="btn btn-ghost" style="width:auto;padding:12px 20px" onclick="cm('goal-modal')">取消</button><button class="btn btn-gold" onclick="saveGoal()">儲存目標 ✓</button></div>
+  </div>
+</div>
+<div class="mb" id="copy-modal" onclick="cmc('copy-modal',event)">
+  <div class="ms"><div class="mh"></div><div class="mt">📋 今日戰報</div>
+    <div class="il">推薦商品（選填，會記住）</div><input class="inp" id="copy-rec" placeholder="例：OPC-3 兒童飲品" maxlength="30" oninput="buildCopy()">
+    <div class="il">內容預覽（可直接修改）</div>
+    <textarea class="inp" id="copy-text" rows="9" style="resize:vertical;line-height:1.7;font-size:.84rem"></textarea>
+    <div class="mr"><button class="btn btn-ghost" style="width:auto;padding:12px 20px" onclick="cm('copy-modal')">取消</button><button class="btn btn-gold" onclick="copyReport()">📋 複製到剪貼簿</button></div>
+  </div>
+</div>
 <div class="cfb" id="cf-bg">
   <div class="cfbox">
     <div style="font-weight:700;font-size:1rem;margin-bottom:8px" id="cf-t">確定嗎？</div>
@@ -494,7 +535,7 @@ const CHARS={
   analyst:{id:'analyst',name:'分析師',emoji:'🔮',mbti:['INTJ','INTP','ISTJ','ISTP'],color:'#60a5fa',colorDim:'rgba(96,165,250,0.12)',desc:'你擁有強大的邏輯思維，能把複雜的系統說得清楚易懂。你的理性分析讓人信服。',traits:['邏輯清晰','系統思維','值得信賴'],tips:{3:['分享有數據支撐的內容：產品研究、制度分析','在社群發有深度的文章，讓人看見你的專業','加朋友前先了解他的背景，找到共同話題'],1:['準備清楚的制度圖表和收益計算，用數字說話','讓對方看見「如果做到，一年後的狀態」','先問問題了解需求，再針對性說明'],2:['整理 FAQ，回答所有常見問題發給對方','跟進時提供新資料：「我找到你有興趣的研究」','每次帶來新的有用資訊，持續跟進']},quotes:['數據不說謊，行動創造結果','系統化思維，複製成功','每個決策都是一步精算'],levelTitles:['見習分析師','初階分析師','覺醒分析師','頂級分析師','傳說分析師'],levelQuotes:['系統建立中，每一步都是數據','你的分析開始影響更多人的決策','覺醒了！頂尖分析師的洞察力覺醒','頂尖分析師，洞察先機，佈局未來','傳說分析師誕生，你的系統改變了整個遊戲規則']},
   connector:{id:'connector',name:'連結者',emoji:'🎯',mbti:['ESFJ','ESFP','ISFJ','ISFP'],color:'#b06eff',colorDim:'rgba(176,110,255,0.12)',desc:'你是天生的社交能手，人緣好、氣氛佳，能讓任何人在你身邊感到舒適和快樂。',traits:['人際廣泛','氣氛活絡','關懷型'],tips:{3:['在日常生活中自然分享，讓產品成為話題','辦小型聚會或活動，創造自然接觸機會','關心朋友近況，在適當時機自然提起事業'],1:['組聚餐或體驗活動，讓商機在輕鬆氛圍呈現','帶朋友參加社群活動，讓環境幫你說話','用體驗代替說明：「你來試試看就知道了」'],2:['定期關心每個人，讓他們感受你的真誠','在群組分享鼓勵和正能量，維持溫暖感','記得每個人的重要日子，在對的時刻接觸']},quotes:['每個連結，都是一扇新的門','人與人之間的溫度，是最強的磁力','讓世界因你而更緊密'],levelTitles:['見習連結者','初階連結者','覺醒連結者','超級連結者','傳說連結者'],levelQuotes:['第一個連結已經開始，世界正在向你打開','你的人脈網絡開始成形','覺醒了！你的連結能力無遠弗屆','超級連結者，每一個認識你的人都是你的力量','傳說連結者誕生，你的影響力已遍及每個角落']}
 };
-const LEVELS=[0,100,250,450,700,1000,1400,1900,2500,3200,4000,5000,6200,7600,9200,11000,13000,15500,18500,22000];
+const LEVELS=[0,100,250,450,700,1000,1400,1900,2500,3200,4000,5000,6200,7600,9200,11000,13000,15500,18500,22000,26000,30500,35500,41000,47000,53500,60500,68500,77500,87500];
 const XPP={3:15,1:25,2:20};
 const SN=['種子期','覺醒期','強化期','菁英期','傳說期'];
 const QS=[
@@ -506,7 +547,7 @@ const QS=[
   {q:'你希望三年後的事業狀態是什麼？',opts:[{t:'🌱 帶領一個充滿愛與凝聚力的大家庭',s:{resonator:2,connector:1}},{t:'🏆 站在台上，成為被人仰望的領袖',s:{commander:2,analyst:1}},{t:'🔬 打造一套可複製的高效經營系統',s:{analyst:2,commander:1}},{t:'🌍 擁有廣大的人脈網絡和朋友圈',s:{connector:2,resonator:1}}]}
 ];
 const TMPLS={3:['加新朋友','主動聊天','發限動互動','IG/FB留言','介紹產品','陌生開發','推薦SHOP.COM'],1:['一對一約談','線上講計畫','帶人參會','分享簡報','發有價值內容','Zoom邀約','直播分享'],2:['關心使用狀況','回答問題','會後跟進','推進決定','確認加入意願','溫暖問候','寄資料']};
-const MS=[{icon:'🌟',label:'第一天達標',chk:(s,l,cd)=>cd>=1},{icon:'🔥',label:'7天連勝',chk:s=>s>=7},{icon:'💫',label:'14天連勝',chk:s=>s>=14},{icon:'👑',label:'30天連勝',chk:s=>s>=30},{icon:'⚡',label:'Lv.5達成',chk:(_,l)=>l>=5},{icon:'💎',label:'Lv.10達成',chk:(_,l)=>l>=10},{icon:'🏆',label:'Lv.15達成',chk:(_,l)=>l>=15},{icon:'🌌',label:'傳說 Lv.20',chk:(_,l)=>l>=20}];
+const MS=[{icon:'🌟',label:'第一天達標',chk:(s,l,cd)=>cd>=1},{icon:'🔥',label:'7天連勝',chk:s=>s>=7},{icon:'💫',label:'14天連勝',chk:s=>s>=14},{icon:'👑',label:'30天連勝',chk:s=>s>=30},{icon:'💰',label:'首筆銷售',chk:()=>CU&&CU.retail&&(CU.retail.sales||[]).length>=1},{icon:'🏪',label:'銷售×10',chk:()=>CU&&CU.retail&&(CU.retail.sales||[]).length>=10},{icon:'⚡',label:'Lv.5達成',chk:(_,l)=>l>=5},{icon:'💎',label:'Lv.10達成',chk:(_,l)=>l>=10},{icon:'🏆',label:'Lv.15達成',chk:(_,l)=>l>=15},{icon:'🌌',label:'傳說 Lv.20',chk:(_,l)=>l>=20},{icon:'🚀',label:'Lv.25達成',chk:(_,l)=>l>=25},{icon:'🌠',label:'神話 Lv.30',chk:(_,l)=>l>=30}];
 
 // ============================================================
 // IMAGE MAP — 40 character portraits (Higgsfield Recraft 4.1)
@@ -676,7 +717,7 @@ function renderHome(){
   document.getElementById('tip3').textContent=tips[3][Math.floor(Math.random()*tips[3].length)];
   document.getElementById('tip1').textContent=tips[1][Math.floor(Math.random()*tips[1].length)];
   document.getElementById('tip2').textContent=tips[2][Math.floor(Math.random()*tips[2].length)];
-  renderMilestones(ch);renderToday();
+  renderMilestones(ch);renderToday();renderRetail();
 }
 function renderMilestones(ch){const s=streak(),lv=CU.level||1,cd=Object.values(CU.days||{}).filter(d=>d.completed).length;document.getElementById('ms-strip').innerHTML=MS.map(m=>{const ok=m.chk(s,lv,cd);return`<div class="msc ${ok?'':'locked'}" style="background:${ok?ch.colorDim:'var(--bg3)'};border-color:${ok?ch.color+'40':'var(--border)'}"><div class="msci">${m.icon}</div><div class="mscl" style="color:${ok?ch.color:'var(--muted2)'}">${m.label}</div></div>`;}).join('');}
 function dk(){const d=new Date();return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
@@ -695,7 +736,7 @@ function setF(id,done,total){const el=document.getElementById('fi-'+id);document
 function rg(cid,actions){document.getElementById(cid).innerHTML=actions.map(a=>`<div class="ai done"><div class="ach">✓</div><div class="ab"><div class="an">${esc(a.name||'—')}</div>${a.note?`<div class="ano">${esc(a.note)}</div>`:''}</div><div class="axp">+${XPP[a.type]}XP</div><button class="aed" onclick="openEditAct(event,'${a.id}')">編輯</button></div>`).join('');}
 async function togAct(id){const today=dobj(),a=today.actions.find(x=>x.id===id);if(!a)return;a.done=!a.done;if(a.done){CU.xp=(CU.xp||0)+XPP[a.type];snd('check');chkLvUp();}else CU.xp=Math.max(0,(CU.xp||0)-XPP[a.type]);await saveUser();renderHome();}
 async function chkCmp(d3,d1,d2){const today=dobj(),was=today.completed;today.completed=d3>=3&&d1>=1&&d2>=2;if(!was&&today.completed){await saveUser();setTimeout(()=>toast('🎉 今日 3-1-2 全部達標！','to'),400);snd('complete');addTL('🎯','今日 3-1-2 全部達標！');}else await saveUser();}
-async function chkLvUp(){const lv=CU.level||1,xp=CU.xp||0;if(xp>=LEVELS[Math.min(lv,LEVELS.length-1)]&&lv<20){CU.level=lv+1;await saveUser();showLU(lv+1);addTL('⭐',`升級到 Lv.${lv+1}！`);}}
+async function chkLvUp(){let lv=CU.level||1;const xp=CU.xp||0;let up=false;while(lv<30&&xp>=LEVELS[Math.min(lv,LEVELS.length-1)]){lv++;up=true;addTL('⭐',`升級到 Lv.${lv}！`);}if(up){CU.level=lv;await saveUser();showLU(lv);}}
 function addTL(icon,text){if(!CU.timeline)CU.timeline=[];CU.timeline.push({icon,text,date:dk(),ts:Date.now()});CU.timeline=CU.timeline.slice(-50);}
 function streak(){let s=0;const d=new Date();for(let i=0;i<365;i++){const k=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;if(CU.days&&CU.days[k]&&CU.days[k].completed)s++;else if(i>0)break;d.setDate(d.getDate()-1);}return s;}
 function showLU(lv){
@@ -751,6 +792,122 @@ function delActCf(){showCf('刪除記錄','確定要刪除這筆記錄嗎？',as
   today.completed=ac.filter(x=>x.type===3).length>=3&&ac.filter(x=>x.type===1).length>=1&&ac.filter(x=>x.type===2).length>=2;
   await saveUser();cm('edit-modal');renderHome();toast('已刪除','tg');
 });}
+/* RETAIL */
+let editSid=null,lbMode='all';
+function retail(){if(!CU.retail)CU.retail={};const r=CU.retail;if(!r.weeklyGoal)r.weeklyGoal={bv:0,income:0};if(!r.sales)r.sales=[];if(!r.bonusWeeks)r.bonusWeeks={};if(r.recommend===undefined)r.recommend='';return r;}
+function mondayOf(d){const x=new Date(d);x.setDate(x.getDate()-((x.getDay()+6)%7));return`${x.getFullYear()}-${String(x.getMonth()+1).padStart(2,'0')}-${String(x.getDate()).padStart(2,'0')}`;}
+function fmtMoney(n){return(+n||0).toLocaleString('zh-TW');}
+function uSales(u){return(u&&u.retail&&u.retail.sales)||[];}
+function profitOf(s){return(+s.price||0)-(+s.cost||0);}
+function sumProfit(a){return a.reduce((t,s)=>t+profitOf(s),0);}
+function sumBV(a){return a.reduce((t,s)=>t+(+s.bv||0),0);}
+function weekSales(u){const m=mondayOf(new Date());return uSales(u||CU).filter(s=>(s.date||'')>=m);}
+function renderRetail(){
+  const el=document.getElementById('retail-week');if(!el)return;
+  const r=retail(),ws=weekSales(),wp=sumProfit(ws),wb=sumBV(ws),g=r.weeklyGoal||{};
+  document.getElementById('acR').textContent='$'+fmtMoney(wp);
+  const bar=(label,val,goal,col,money)=>{const vT=money?'$'+fmtMoney(val):val,gT=money?'$'+fmtMoney(goal):goal;if(goal>0){const pct=Math.min(100,Math.round(val/goal*100));return`<div style="margin-bottom:8px"><div class="xpr"><span>${label}</span><span>${vT} / ${gT}（${pct}%）</span></div><div class="xpt" style="height:8px"><div class="xpb" style="width:${pct}%;background:linear-gradient(90deg,${col},${col}aa)"></div></div></div>`;}return`<div style="display:flex;justify-content:space-between;font-size:.74rem;color:var(--muted2);margin-bottom:6px;font-family:var(--mono)"><span>${label}</span><span style="color:${col}">${vT}</span></div>`;};
+  el.innerHTML=`<div class="card" style="margin-bottom:6px">${bar('本週利潤',wp,+g.income||0,'var(--green2)',true)}${bar('本週 BV',wb,+g.bv||0,'var(--gold)',false)}<div style="font-size:.62rem;color:var(--muted);margin-top:2px">本週 ${ws.length} 筆${(+g.bv||+g.income)?'':' · 到「設定」訂每週目標可拿達標獎勵'}</div></div>`;
+}
+function openSale(sid){
+  editSid=sid||null;
+  const r=retail();let s={item:'',srp:'',price:'',cost:'',bv:'',customer:'',date:dk(),careDate:''};
+  if(sid){const f=r.sales.find(x=>x.id===sid);if(f)s={...f};}
+  document.getElementById('sale-title').textContent=sid?'編輯銷售':'記錄銷售';
+  document.getElementById('s-item').value=s.item||'';
+  document.getElementById('s-price').value=s.price??'';
+  document.getElementById('s-cost').value=s.cost??'';
+  document.getElementById('s-bv').value=s.bv??'';
+  document.getElementById('s-srp').value=s.srp??'';
+  document.getElementById('s-cust').value=s.customer||'';
+  document.getElementById('s-date').value=s.date||dk();
+  document.getElementById('s-care').value=s.careDate||'';
+  document.getElementById('s-del').style.display=sid?'block':'none';
+  calcProfit();om('sale-modal');
+  if(!sid)setTimeout(()=>document.getElementById('s-item').focus(),350);
+}
+function calcProfit(){const p=+document.getElementById('s-price').value||0,c=+document.getElementById('s-cost').value||0,el=document.getElementById('s-profit');el.textContent='$'+fmtMoney(p-c);el.style.color=(p-c)>=0?'var(--green2)':'var(--red)';}
+async function saveSale(){
+  const item=document.getElementById('s-item').value.trim();
+  const pv=document.getElementById('s-price').value,cv=document.getElementById('s-cost').value,bvv=document.getElementById('s-bv').value;
+  if(!item){toast('請輸入品項','tr');return;}
+  if(pv===''||isNaN(+pv)){toast('請輸入成交價','tr');return;}
+  if(cv===''||isNaN(+cv)){toast('請輸入成本','tr');return;}
+  if(bvv===''||isNaN(+bvv)||+bvv<0){toast('請輸入 BV 分數','tr');return;}
+  const price=+pv,cost=+cv,bv=+bvv;
+  const srp=document.getElementById('s-srp').value===''?'':+document.getElementById('s-srp').value;
+  const customer=document.getElementById('s-cust').value.trim();
+  const date=document.getElementById('s-date').value||dk();
+  const careDate=document.getElementById('s-care').value||'';
+  const r=retail();
+  if(editSid){
+    const s=r.sales.find(x=>x.id===editSid);if(!s)return;
+    const oldBV=+s.bv||0;
+    Object.assign(s,{item,srp,price,cost,bv,customer,date,careDate});
+    CU.xp=Math.max(0,(CU.xp||0)+(bv-oldBV));
+    toast('✓ 銷售已更新','tg');
+  }else{
+    r.sales.push({id:uid(),item,srp,price,cost,bv,customer,date,careDate,ts:Date.now()});
+    CU.xp=(CU.xp||0)+bv;
+    addTL('💰',`賣出 ${item}，利潤 $${fmtMoney(price-cost)}`);
+    toast(`✓ 已記錄銷售 +${bv}XP`,'tg');snd('check');
+  }
+  checkWeekGoal();
+  await saveUser();await chkLvUp();
+  cm('sale-modal');renderHome();
+  if(document.getElementById('page-stats').classList.contains('active'))renderStats();
+}
+function delSaleCf(){showCf('刪除銷售','確定刪除這筆銷售嗎？對應的 BV XP 會一併扣除。',async()=>{
+  const r=retail(),s=r.sales.find(x=>x.id===editSid);
+  if(s)CU.xp=Math.max(0,(CU.xp||0)-(+s.bv||0));
+  r.sales=r.sales.filter(x=>x.id!==editSid);
+  await saveUser();cm('sale-modal');renderHome();
+  if(document.getElementById('page-stats').classList.contains('active'))renderStats();
+  toast('已刪除','tg');
+});}
+function checkWeekGoal(){
+  const r=retail(),g=r.weeklyGoal||{},tBV=+g.bv||0,tInc=+g.income||0;
+  if(!tBV&&!tInc)return;
+  const wk=mondayOf(new Date());
+  if(r.bonusWeeks[wk])return;
+  const ws=weekSales();
+  if((!tBV||sumBV(ws)>=tBV)&&(!tInc||sumProfit(ws)>=tInc)){
+    r.bonusWeeks[wk]=true;CU.xp=(CU.xp||0)+50;
+    addTL('🏅','本週零售目標達成！+50XP');
+    setTimeout(()=>{toast('🏅 本週零售目標達成 +50XP','to');snd('complete');},700);
+  }
+}
+function openGoal(){const g=retail().weeklyGoal||{};document.getElementById('g-bv').value=g.bv||'';document.getElementById('g-income').value=g.income||'';om('goal-modal');}
+async function saveGoal(){const r=retail();r.weeklyGoal={bv:+document.getElementById('g-bv').value||0,income:+document.getElementById('g-income').value||0};checkWeekGoal();await saveUser();cm('goal-modal');renderSet();renderRetail();toast('週目標已更新','tg');}
+function renderLedger(){
+  const sEl=document.getElementById('ledger-sum'),lEl=document.getElementById('ledger-list');if(!sEl)return;
+  const all=[...retail().sales].sort((a,b)=>(b.date||'').localeCompare(a.date||'')||((b.ts||0)-(a.ts||0)));
+  const tp=sumProfit(all),tb=sumBV(all);
+  sEl.innerHTML=`<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center"><div><div style="font-family:var(--orb);font-size:1.1rem;color:var(--green2)">$${fmtMoney(tp)}</div><div style="font-size:.56rem;color:var(--muted2)">累積利潤</div></div><div><div style="font-family:var(--orb);font-size:1.1rem;color:var(--gold)">${fmtMoney(tb)}</div><div style="font-size:.56rem;color:var(--muted2)">累積 BV</div></div><div><div style="font-family:var(--orb);font-size:1.1rem;color:var(--blue)">${all.length}</div><div style="font-size:.56rem;color:var(--muted2)">銷售筆數</div></div></div>`;
+  lEl.innerHTML=all.slice(0,15).map(s=>`<div class="ai"><div class="ab"><div class="an">💰 ${esc(s.item)}${s.customer?` <span style="font-size:.64rem;color:var(--muted2)">→ ${esc(s.customer)}</span>`:''}</div><div class="ano">${esc(s.date||'')} · BV ${+s.bv||0}${s.careDate?` · 🔔 ${esc(s.careDate)} 關懷`:''}</div></div><div class="axp" style="color:${profitOf(s)>=0?'var(--green2)':'var(--red)'};background:var(--green-dim);border-color:rgba(34,211,122,.15)">$${fmtMoney(profitOf(s))}</div><button class="aed" onclick="openSale('${s.id}')">編輯</button></div>`).join('')||'<div class="card" style="text-align:center;color:var(--muted);font-size:.82rem;padding:18px">尚無銷售記錄，到「今日」頁記下第一筆吧！</div>';
+}
+/* COPY REPORT */
+function openCopy(){document.getElementById('copy-rec').value=retail().recommend||'';buildCopy();om('copy-modal');}
+function buildCopy(){
+  const ch=CHARS[CU.charId]||CHARS.resonator,ac=dobj().actions||[];
+  const grp=t=>{const m={};ac.filter(a=>a.type===t).forEach(a=>{m[a.name]=(m[a.name]||0)+1;});const e=Object.entries(m);return e.length?e.map(([n,c])=>c>1?`${n}×${c}`:n).join('、'):'—';};
+  const d3=ac.filter(a=>a.type===3).length,d1=ac.filter(a=>a.type===1).length,d2=ac.filter(a=>a.type===2).length;
+  const wp=sumProfit(weekSales()),rec=document.getElementById('copy-rec').value.trim();
+  let t=`我是 ${CU.name}（${ch.name}），今日 3-1-2 完成：\n🌊 接觸 ${d3}/3：${grp(3)}\n📣 曝光 ${d1}/1：${grp(1)}\n🔄 跟進 ${d2}/2：${grp(2)}`;
+  if(wp>0)t+=`\n💰 這週累積賺取了 ${fmtMoney(wp)} 元`;
+  if(rec)t+=`\n🎁 我想推薦「${rec}」給大家，一起增加收入！`;
+  t+=`\n🔥 連續達標 ${streak()} 天 · Lv.${CU.level||1} ${ch.levelTitles[Math.min(Math.floor(((CU.level||1)-1)/4),4)]}`;
+  document.getElementById('copy-text').value=t;
+}
+async function copyReport(){
+  const ta=document.getElementById('copy-text'),txt=ta.value;
+  const r=retail();r.recommend=document.getElementById('copy-rec').value.trim();saveUser();
+  let ok=false;
+  try{await navigator.clipboard.writeText(txt);ok=true;}catch(e){}
+  if(!ok){try{ta.focus();ta.select();ta.setSelectionRange(0,txt.length);ok=document.execCommand('copy');}catch(e){}}
+  if(ok){toast('✓ 已複製，去群組貼上吧！','tg');snd('check');cm('copy-modal');}
+  else toast('請長按文字框手動複製','to');
+}
 /* STATS */
 function renderStats(){
   if(!CU)return;
@@ -780,6 +937,7 @@ function renderStats(){
   tlEl.innerHTML=items.length?items.map(it=>`<div class="tli"><div class="tld" style="background:${ch.color};color:${ch.color}"></div><div class="tlda">${it.date}</div><div class="tlt">${it.icon} ${esc(it.text)}</div></div>`).join(''):'<div style="font-size:.8rem;color:var(--muted);padding:4px 0">完成行動後這裡會記錄你的成長故事</div>';
   const rl=document.getElementById('recent-log');const sk=Object.keys(CU.days||{}).sort().reverse().slice(0,7);
   rl.innerHTML=sk.length?sk.map(k=>{const d=CU.days[k];const ac=d.actions||[];const r3=ac.filter(a=>a.type===3&&a.done).length,r1=ac.filter(a=>a.type===1&&a.done).length,r2=ac.filter(a=>a.type===2&&a.done).length;return`<div style="background:linear-gradient(135deg,var(--bg2),var(--bg1));border:1px solid var(--border);border-radius:var(--r-sm);padding:12px 14px;margin-bottom:8px"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px"><div style="font-family:var(--mono);font-size:.72rem;color:var(--muted2)">${k}</div>${d.completed?'<span class="pill green">✓ 達標</span>':'<span class="pill muted">未達標</span>'}</div><div style="display:flex;gap:6px;flex-wrap:wrap"><span class="pill gold">接觸 ${r3}/3</span><span class="pill blue">曝光 ${r1}/1</span><span class="pill purple">跟進 ${r2}/2</span></div></div>`;}).join(''):'<div class="card" style="text-align:center;color:var(--muted);font-size:.82rem;padding:20px">尚無記錄，從今天開始！</div>';
+  renderLedger();
 }
 function renderXpChart(color){
   const svg=document.getElementById('xp-chart'),days=CU.days||{},allK=Object.keys(days).sort();
@@ -798,8 +956,13 @@ async function renderTeam(){
   const q=query(collection(window.db,'users'),where('leader','==',CU.leader));
   const snap=await getDocs(q);
   const members=[];snap.forEach(d=>{if(d.id!==CU.username)members.push({...d.data(),username:d.id});});
+  window._tm=members;
   renderTeamUI(members);
 }
+function setLB(m){lbMode=m;['all','month','quarter'].forEach(x=>{const t=document.getElementById('lbt-'+x);if(t)t.classList.toggle('active',x===m);});if(window._tm)renderTeamUI(window._tm);}
+function periodFrom(m){const n=new Date();if(m==='month')return`${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}-01`;if(m==='quarter'){const qm=Math.floor(n.getMonth()/3)*3+1;return`${n.getFullYear()}-${String(qm).padStart(2,'0')}-01`;}return'';}
+function periodXP(u,from){if(!from)return u.xp||0;let x=0;Object.entries(u.days||{}).forEach(([k,d])=>{if(k>=from)(d.actions||[]).forEach(a=>{x+=XPP[a.type]||0;});});uSales(u).forEach(s=>{if((s.date||'')>=from)x+=(+s.bv||0);});return x;}
+function periodProfit(u,from){return uSales(u).filter(s=>!from||(s.date||'')>=from).reduce((t,s)=>t+profitOf(s),0);}
 function renderTeamUI(members){
   const today=dk(),ch=CHARS[CU.charId]||CHARS.resonator;
   const myD=CU.days&&CU.days[today];
@@ -809,9 +972,12 @@ function renderTeamUI(members){
   const myD2=myD?(myD.actions||[]).filter(a=>a.type===2&&a.done).length:0;
   const tF=members.filter(m=>m.days&&m.days[today]&&m.days[today].completed).length;
   document.getElementById('team-sum').innerHTML=`<div class="tsi"><div class="tsn" style="color:var(--gold)">${members.length+1}</div><div class="tsl">團隊人數</div></div><div class="tsi"><div class="tsn" style="color:var(--green)">${tF+(myDone?1:0)}</div><div class="tsl">今日達標</div></div><div class="tsi"><div class="tsn" style="color:var(--purple)">${streak()}</div><div class="tsl">我的連續天</div></div>`;
-  const all=[{name:CU.name,lv:CU.level||1,xp:CU.xp||0,emoji:ch.emoji,color:ch.color,done:myDone,isMe:true,streak:streak(),region:CU.region},...members.map(m=>{const mc=CHARS[m.charId]||CHARS.resonator;return{name:m.name,lv:m.level||1,xp:m.xp||0,emoji:mc.emoji,color:mc.color,done:m.days&&m.days[today]&&m.days[today].completed,isMe:false,streak:calcMS(m),region:m.region};})].sort((a,b)=>b.xp-a.xp);
+  const from=periodFrom(lbMode);
+  const mkRow=(u,isMe)=>{const c=CHARS[u.charId]||CHARS.resonator;return{name:u.name,lv:u.level||1,score:periodXP(u,from),prof:periodProfit(u,from),emoji:c.emoji,color:c.color,done:u.days&&u.days[today]&&u.days[today].completed,isMe,streak:isMe?streak():calcMS(u),region:u.region};};
+  const all=[mkRow(CU,true),...members.map(m=>mkRow(m,false))].sort((a,b)=>b.score-a.score);
   const RE=['🥇','🥈','🥉'];
-  document.getElementById('leaderboard').innerHTML=all.map((p,i)=>`<div class="lbi"><div class="lbr" style="color:${i===0?'#ffd700':i===1?'#c0c0c0':i===2?'#cd7f32':'var(--muted)'}">${i<3?RE[i]:i+1}</div><div class="lba" style="background:${p.isMe?ch.colorDim:'var(--bg3)'};border:2px solid ${p.isMe?ch.color:'var(--border2)'}">${p.emoji}</div><div class="lbii"><div class="lbn">${esc(p.name)}${p.isMe?'<span style="font-size:.55rem;color:var(--gold);background:var(--gold-dim);padding:1px 6px;border-radius:4px;font-weight:700;border:1px solid rgba(245,200,66,.2)">我</span>':''} <span style="font-size:.58rem;color:var(--muted2)">${p.region}</span></div><div class="lbs">Lv.${p.lv} · ${p.done?'✅今日達標':'⏳進行中'} · 🔥${p.streak}天</div></div><div class="lbx">${p.xp}<span style="font-size:.56rem;color:var(--muted2)"> XP</span></div></div>`).join('');
+  const modeLbl=lbMode==='month'?'本月':lbMode==='quarter'?'本季':'';
+  document.getElementById('leaderboard').innerHTML=all.map((p,i)=>`<div class="lbi"><div class="lbr" style="color:${i===0?'#ffd700':i===1?'#c0c0c0':i===2?'#cd7f32':'var(--muted)'}">${i<3?RE[i]:i+1}</div><div class="lba" style="background:${p.isMe?ch.colorDim:'var(--bg3)'};border:2px solid ${p.isMe?ch.color:'var(--border2)'}">${p.emoji}</div><div class="lbii"><div class="lbn">${esc(p.name)}${p.isMe?'<span style="font-size:.55rem;color:var(--gold);background:var(--gold-dim);padding:1px 6px;border-radius:4px;font-weight:700;border:1px solid rgba(245,200,66,.2)">我</span>':''} <span style="font-size:.58rem;color:var(--muted2)">${p.region}</span></div><div class="lbs">Lv.${p.lv} · ${p.done?'✅今日達標':'⏳進行中'} · 🔥${p.streak}天${p.prof>0?` · <span style="color:var(--green2)">💰$${fmtMoney(p.prof)}</span>`:''}</div></div><div class="lbx">${p.score}<span style="font-size:.56rem;color:var(--muted2)"> ${modeLbl}XP</span></div></div>`).join('');
   let html=`<div class="mc me"><div class="mct"><div class="mca" style="color:${ch.color};border-color:${ch.color};box-shadow:0 0 12px ${ch.color}30">${ch.emoji}</div><div class="mci"><div class="mcn">${esc(CU.name)} <span style="font-size:.55rem;color:var(--gold);background:var(--gold-dim);padding:2px 6px;border-radius:4px;font-weight:700;border:1px solid rgba(245,200,66,.2)">我</span></div><div class="mcs">Lv.${CU.level||1} · ${CU.region} · 連續 ${streak()} 天</div></div><div class="mc3">${m3d(myD3,3,'接觸')}${m3d(myD1,1,'曝光')}${m3d(myD2,2,'跟進')}</div></div></div>`;
   html+=members.map(m=>{const mc=CHARS[m.charId]||CHARS.resonator,d=m.days&&m.days[today],p3=d?(d.actions||[]).filter(a=>a.type===3&&a.done).length:0,p1=d?(d.actions||[]).filter(a=>a.type===1&&a.done).length:0,p2=d?(d.actions||[]).filter(a=>a.type===2&&a.done).length:0,full=d&&d.completed;return`<div class="mc"><div class="mct"><div class="mca" style="color:${mc.color};border-color:${mc.color}50">${mc.emoji}</div><div class="mci"><div class="mcn">${esc(m.name)} <span style="font-size:.58rem;color:var(--muted2)">${m.region}</span></div><div class="mcs">Lv.${m.level||1} · ${full?'✅今日達標':d?'⏳進行中':'未更新'} · 🔥${calcMS(m)}天</div></div><div class="mc3">${m3d(p3,3,'接觸')}${m3d(p1,1,'曝光')}${m3d(p2,2,'跟進')}</div></div><div class="mcb"><div class="mcm">${m.xp||0} XP · ${esc((CHARS[m.charId]||CHARS.resonator).levelTitles[Math.min(Math.floor(((m.level||1)-1)/4),4)])}</div><button class="chb" onclick="cheer(event,'${esc(m.name)}')">💪 加油</button></div></div>`;}).join('');
   document.getElementById('member-list').innerHTML=html;
@@ -820,7 +986,7 @@ function calcMS(m){let s=0;const d=new Date();for(let i=0;i<365;i++){const k=`${
 function m3d(v,t,l){const cls=v>=t?'full':v>0?'part':'';return`<div class="m3d ${cls}"><div class="m3v">${v}/${t}</div><div class="m3k">${l}</div></div>`;}
 function cheer(e,name){e.stopPropagation();toast(`💪 為 ${name} 打氣！加油衝！`,'tp');snd('check');}
 /* SETTINGS */
-function renderSet(){if(!CU)return;const ch=CHARS[CU.charId]||CHARS.resonator;document.getElementById('sr-icon').textContent=ch.emoji;document.getElementById('sr-name').textContent=`${CU.name}（${CU.username}）`;document.getElementById('sr-sub').textContent=`${CU.region} · 大C：${CU.leader} · Lv.${CU.level||1} · ${CU.xp||0} XP`;}
+function renderSet(){if(!CU)return;const ch=CHARS[CU.charId]||CHARS.resonator;document.getElementById('sr-icon').textContent=ch.emoji;document.getElementById('sr-name').textContent=`${CU.name}（${CU.username}）`;document.getElementById('sr-sub').textContent=`${CU.region} · 大C：${CU.leader} · Lv.${CU.level||1} · ${CU.xp||0} XP`;const g=(CU.retail&&CU.retail.weeklyGoal)||{};const gs=document.getElementById('goal-sub');if(gs)gs.textContent=(+g.bv||+g.income)?`每週 BV ${g.bv||0} · 利潤 $${fmtMoney(g.income||0)}`:'尚未設定，點擊設定（達標 +50XP）';}
 function openChangeName(){document.getElementById('new-name').value=CU.name||'';om('name-modal');setTimeout(()=>document.getElementById('new-name').focus(),350);}
 async function saveName(){const n=document.getElementById('new-name').value.trim();if(!n)return;CU.name=n;await saveUser();cm('name-modal');renderSet();renderHome();toast('姓名已更新','tg');}
 function openChangePass(target){passTarget=target;document.getElementById('pass-modal-title').textContent=target==='admin'?'修改管理員密碼':'修改密碼';document.getElementById('new-pass').value='';document.getElementById('new-pass2').value='';om('pass-modal');setTimeout(()=>document.getElementById('new-pass').focus(),350);}
