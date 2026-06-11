@@ -416,7 +416,7 @@ nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-w
         <div class="setr" onclick="exportData()"><div class="seti">📤</div><div class="setii"><div class="setn">匯出我的記錄</div><div class="sets">下載 JSON 備份</div></div><div style="color:var(--muted);font-size:.8rem">›</div></div>
         <div class="setr" onclick="doLogout()"><div class="seti">🚪</div><div class="setii"><div class="setn">登出</div><div class="sets">返回登入頁面</div></div><div style="color:var(--muted);font-size:.8rem">›</div></div>
         <div class="card" style="text-align:center;margin-top:4px;padding:24px">
-          <div style="font-family:var(--orb);font-size:1.1rem;background:linear-gradient(135deg,var(--gold),var(--purple2));-webkit-background-clip:text;-webkit-text-fill-color:transparent">3-1-2 DMO v3.2</div>
+          <div style="font-family:var(--orb);font-size:1.1rem;background:linear-gradient(135deg,var(--gold),var(--purple2));-webkit-background-clip:text;-webkit-text-fill-color:transparent">3-1-2 DMO v3.3</div>
           <div style="font-size:.66rem;color:var(--muted);margin-top:10px;line-height:1.8">成功不是靠爆發，而是靠每天重複簡單動作<br><span style="color:var(--gold)">流量</span> · <span style="color:var(--blue)">曝光</span> · <span style="color:var(--purple)">跟進</span></div>
         </div>
       </div>
@@ -486,7 +486,6 @@ nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-w
     <div class="il">品項 *</div><input class="inp" id="s-item" placeholder="例：OPC-3、魚油" maxlength="30">
     <div style="display:flex;gap:8px"><div style="flex:1"><div class="il">成交價 *</div><input class="inp" id="s-price" type="number" inputmode="decimal" placeholder="1500" oninput="calcProfit()"></div><div style="flex:1"><div class="il">成本 *</div><input class="inp" id="s-cost" type="number" inputmode="decimal" placeholder="1100" oninput="calcProfit()"></div></div>
     <div style="display:flex;gap:8px"><div style="flex:1"><div class="il">BV 分數 *</div><input class="inp" id="s-bv" type="number" inputmode="decimal" placeholder="25"></div><div style="flex:1"><div class="il">IBV 分數</div><input class="inp" id="s-ibv" type="number" inputmode="decimal" placeholder="選填"></div></div>
-    <div class="il">零售價（參考，選填）</div><input class="inp" id="s-srp" type="number" inputmode="decimal" placeholder="建議售價">
     <div class="il">顧客（選填）</div><input class="inp" id="s-cust" placeholder="例：王小姐" maxlength="20">
     <div style="display:flex;gap:8px"><div style="flex:1"><div class="il">售出日期</div><input class="inp" id="s-date" type="date" style="color-scheme:dark"></div><div style="flex:1"><div class="il">關懷提醒日（選填）</div><input class="inp" id="s-care" type="date" style="color-scheme:dark"></div></div>
     <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:var(--green-dim);border:1px solid rgba(34,211,122,.2);border-radius:var(--r-sm);margin-bottom:14px"><span style="font-size:.75rem;color:var(--muted2)">零售利潤（成交價−成本）</span><span style="font-family:var(--orb);font-size:1.1rem;color:var(--green2)" id="s-profit">$0</span></div>
@@ -814,7 +813,7 @@ function renderRetail(){
 }
 function openSale(sid){
   editSid=sid||null;
-  const r=retail();let s={item:'',srp:'',price:'',cost:'',bv:'',ibv:'',customer:'',date:dk(),careDate:''};
+  const r=retail();let s={item:'',price:'',cost:'',bv:'',ibv:'',customer:'',date:dk(),careDate:''};
   if(sid){const f=r.sales.find(x=>x.id===sid);if(f)s={...f};}
   document.getElementById('sale-title').textContent=sid?'編輯銷售':'記錄銷售';
   document.getElementById('s-item').value=s.item||'';
@@ -822,7 +821,6 @@ function openSale(sid){
   document.getElementById('s-cost').value=s.cost??'';
   document.getElementById('s-bv').value=s.bv??'';
   document.getElementById('s-ibv').value=s.ibv??'';
-  document.getElementById('s-srp').value=s.srp??'';
   document.getElementById('s-cust').value=s.customer||'';
   document.getElementById('s-date').value=s.date||dk();
   document.getElementById('s-care').value=s.careDate||'';
@@ -840,7 +838,6 @@ async function saveSale(){
   if(bvv===''||isNaN(+bvv)||+bvv<0){toast('請輸入 BV 分數','tr');return;}
   const price=+pv,cost=+cv,bv=+bvv;
   const ibv=document.getElementById('s-ibv').value===''?0:+document.getElementById('s-ibv').value;
-  const srp=document.getElementById('s-srp').value===''?'':+document.getElementById('s-srp').value;
   const customer=document.getElementById('s-cust').value.trim();
   const date=document.getElementById('s-date').value||dk();
   const careDate=document.getElementById('s-care').value||'';
@@ -848,11 +845,11 @@ async function saveSale(){
   if(editSid){
     const s=r.sales.find(x=>x.id===editSid);if(!s)return;
     const oldBV=+s.bv||0;
-    Object.assign(s,{item,srp,price,cost,bv,ibv,customer,date,careDate});
+    Object.assign(s,{item,price,cost,bv,ibv,customer,date,careDate});
     CU.xp=Math.max(0,(CU.xp||0)+(bv-oldBV));
     toast('✓ 銷售已更新','tg');
   }else{
-    r.sales.push({id:uid(),item,srp,price,cost,bv,ibv,customer,date,careDate,ts:Date.now()});
+    r.sales.push({id:uid(),item,price,cost,bv,ibv,customer,date,careDate,ts:Date.now()});
     CU.xp=(CU.xp||0)+bv;
     addTL('💰',`賣出 ${item}，利潤 $${fmtMoney(price-cost)}`);
     toast(`✓ 已記錄銷售 +${bv}XP`,'tg');snd('check');
