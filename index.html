@@ -166,6 +166,8 @@ body::before{content:'';position:fixed;inset:0;z-index:0;
           <input class="inp" id="r-leader" placeholder="例：珉適" maxlength="20">
         </div>
       </div>
+      <div class="inp-label">所屬小C（小組長名稱，選填）</div>
+      <input class="inp" id="r-subleader" placeholder="例：阿明組（沒有可留空）" maxlength="20">
       <button class="btn-gold" id="reg-btn" onclick="doRegister()">註冊並開始人格測驗 →</button>
       <div class="hint">已有帳號？點上方「登入」</div>
     </div>
@@ -281,6 +283,7 @@ async function doRegister(){
   const name=v('r-name');
   const region=v('r-region');
   const leader=v('r-leader');
+  const subLeader=v('r-subleader');
   if(!username||!password||!name||!region||!leader){toast('請填寫所有欄位','red');return;}
   if(!/^[a-z0-9_]{3,20}$/.test(username)){toast('帳號只能用英文小寫、數字、底線（3-20字）','red');return;}
   if(password.length<4){toast('密碼至少 4 碼','red');return;}
@@ -294,7 +297,8 @@ async function doRegister(){
     const aSnap=await getDoc(doc(window.db,'admins',username));
     if(aSnap.exists()){toast('此帳號已被使用，請換一個','red');return;}
     const userData={
-      username,password,name,region,leader,
+      username,password,name,region,leader,subLeader,
+      role:'member',managedSubC:'',
       charId:'',xp:0,level:1,
       days:{},timeline:[],
       createdAt:new Date().toISOString()

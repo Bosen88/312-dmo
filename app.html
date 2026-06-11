@@ -421,11 +421,12 @@ nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-w
         <div class="setr" onclick="reQuiz()"><div class="seti">🎮</div><div class="setii"><div class="setn">重新測驗人格</div><div class="sets">換一個角色類型</div></div><div style="color:var(--muted);font-size:.8rem">›</div></div>
         <div class="setr" onclick="reGender()"><div class="seti">👤</div><div class="setii"><div class="setn">更換角色性別</div><div class="sets">切換男性/女性立繪</div></div><div style="color:var(--muted);font-size:.8rem">›</div></div>
         <div class="setr" onclick="openGoal()"><div class="seti">🎯</div><div class="setii"><div class="setn">每週零售目標</div><div class="sets" id="goal-sub">設定每週 BV / 利潤目標</div></div><div style="color:var(--muted);font-size:.8rem">›</div></div>
+        <div class="setr" id="subadmin-entry" style="display:none;border-color:rgba(176,110,255,.3);background:var(--purple-dim)" onclick="goPage('admin')"><div class="seti">🛡️</div><div class="setii"><div class="setn">小C 管理後台</div><div class="sets" id="subadmin-sub">管理我的小C團隊</div></div><div style="color:var(--muted);font-size:.8rem">›</div></div>
         <div class="lbl" style="margin-top:4px">帳號操作</div>
         <div class="setr" onclick="exportData()"><div class="seti">📤</div><div class="setii"><div class="setn">匯出我的記錄</div><div class="sets">下載 JSON 備份</div></div><div style="color:var(--muted);font-size:.8rem">›</div></div>
         <div class="setr" onclick="doLogout()"><div class="seti">🚪</div><div class="setii"><div class="setn">登出</div><div class="sets">返回登入頁面</div></div><div style="color:var(--muted);font-size:.8rem">›</div></div>
         <div class="card" style="text-align:center;margin-top:4px;padding:24px">
-          <div style="font-family:var(--orb);font-size:1.1rem;background:linear-gradient(135deg,var(--gold),var(--purple2));-webkit-background-clip:text;-webkit-text-fill-color:transparent">3-1-2 DMO v3.4</div>
+          <div style="font-family:var(--orb);font-size:1.1rem;background:linear-gradient(135deg,var(--gold),var(--purple2));-webkit-background-clip:text;-webkit-text-fill-color:transparent">3-1-2 DMO v3.5</div>
           <div style="font-size:.66rem;color:var(--muted);margin-top:10px;line-height:1.8">成功不是靠爆發，而是靠每天重複簡單動作<br><span style="color:var(--gold)">流量</span> · <span style="color:var(--blue)">曝光</span> · <span style="color:var(--purple)">跟進</span></div>
         </div>
       </div>
@@ -433,17 +434,18 @@ nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-w
     <!-- ADMIN -->
     <div class="page" id="page-admin">
       <div class="sp">
-        <div style="padding-top:8px;margin-bottom:4px;display:flex;align-items:center;gap:10px"><div style="font-family:var(--orb);font-size:1.2rem;color:var(--red)">管理後台</div><span class="pill red">ADMIN</span></div>
+        <div style="padding-top:8px;margin-bottom:4px;display:flex;align-items:center;gap:10px"><div style="font-family:var(--orb);font-size:1.2rem;color:var(--red)" id="admin-title">管理後台</div><span class="pill red" id="admin-badge">ADMIN</span></div>
         <div style="font-size:.7rem;color:var(--muted2);margin-bottom:16px">登入者：<span id="admin-lbl"></span></div>
         <div class="aov" id="admin-overview"></div>
-        <div class="lbl" style="margin-top:8px;display:flex;justify-content:space-between;align-items:center">💰 團隊銷售彙總 <button class="abtn" style="background:var(--gold-dim);border-color:rgba(245,200,66,.3);color:var(--gold2)" onclick="exportAllCsv()">📥 下載全團隊 CSV</button></div>
+        <div class="lbl" style="margin-top:8px;display:flex;justify-content:space-between;align-items:center">💰 團隊銷售彙總 <button class="abtn" style="background:var(--gold-dim);border-color:rgba(245,200,66,.3);color:var(--gold2)" onclick="exportAllCsv()">📥 下載 CSV</button></div>
         <div id="sales-summary" style="margin-bottom:8px"></div>
         <div class="lbl">店主管理</div>
         <div class="atr" id="admin-tabs"></div>
         <div id="admin-content"></div>
-        <div class="lbl" style="margin-top:8px">管理員操作</div>
-        <div class="setr" onclick="openChangePass('admin')"><div class="seti">🔑</div><div class="setii"><div class="setn">修改管理員密碼</div><div class="sets">更換目前管理員密碼</div></div><div style="color:var(--muted);font-size:.8rem">›</div></div>
-        <div class="setr" onclick="doLogout()"><div class="seti">🚪</div><div class="setii"><div class="setn">登出管理後台</div></div><div style="color:var(--muted);font-size:.8rem">›</div></div>
+        <div class="lbl" style="margin-top:8px" id="admin-ops-lbl">管理員操作</div>
+        <div class="setr" id="admin-pass-row" onclick="openChangePass('admin')"><div class="seti">🔑</div><div class="setii"><div class="setn">修改管理員密碼</div><div class="sets">更換目前管理員密碼</div></div><div style="color:var(--muted);font-size:.8rem">›</div></div>
+        <div class="setr" id="subadmin-back-row" style="display:none" onclick="goPage('settings')"><div class="seti">↩️</div><div class="setii"><div class="setn">返回設定</div></div><div style="color:var(--muted);font-size:.8rem">›</div></div>
+        <div class="setr" id="admin-logout-row" onclick="doLogout()"><div class="seti">🚪</div><div class="setii"><div class="setn">登出管理後台</div></div><div style="color:var(--muted);font-size:.8rem">›</div></div>
       </div>
     </div>
   </div>
@@ -668,7 +670,7 @@ function autoCompleteDay(){
   }
 }
 
-let CU=null,IS_ADMIN=false,ADMIN_UN='',qS={},qStep=0,recC=null,selC=null,addType=3,editAid=null,cfCb=null,passTarget='user',adminAT='ALL';
+let CU=null,IS_ADMIN=false,SUBADMIN_MODE=false,ADMIN_UN='',qS={},qStep=0,recC=null,selC=null,addType=3,editAid=null,cfCb=null,passTarget='user',adminAT='ALL';
 window.addEventListener('fbReady',async()=>{
   const p=new URLSearchParams(location.search);
   const un=p.get('u'),isAdmin=p.get('admin')==='1',isNew=p.get('new')==='1';
@@ -1042,7 +1044,7 @@ function calcMS(m){let s=0;const d=new Date();for(let i=0;i<365;i++){const k=`${
 function m3d(v,t,l){const cls=v>=t?'full':v>0?'part':'';return`<div class="m3d ${cls}"><div class="m3v">${v}/${t}</div><div class="m3k">${l}</div></div>`;}
 function cheer(e,name){e.stopPropagation();toast(`💪 為 ${name} 打氣！加油衝！`,'tp');snd('check');}
 /* SETTINGS */
-function renderSet(){if(!CU)return;const ch=CHARS[CU.charId]||CHARS.resonator;document.getElementById('sr-icon').textContent=ch.emoji;document.getElementById('sr-name').textContent=`${CU.name}（${CU.username}）`;document.getElementById('sr-sub').textContent=`${CU.region} · 大C：${CU.leader} · Lv.${CU.level||1} · ${CU.xp||0} XP`;const g=(CU.retail&&CU.retail.weeklyGoal)||{};const gs=document.getElementById('goal-sub');if(gs){const parts=[];if(+g.bv)parts.push(`BV ${g.bv}`);if(+g.ibv)parts.push(`IBV ${g.ibv}`);if(+g.income)parts.push(`利潤 $${fmtMoney(g.income)}`);gs.textContent=parts.length?'每週 '+parts.join(' · '):'尚未設定，點擊設定（達標 +50XP）';}}
+function renderSet(){if(!CU)return;const ch=CHARS[CU.charId]||CHARS.resonator;document.getElementById('sr-icon').textContent=ch.emoji;document.getElementById('sr-name').textContent=`${CU.name}（${CU.username}）`;document.getElementById('sr-sub').textContent=`${CU.region} · 大C：${CU.leader}${CU.subLeader?` · 小C：${CU.subLeader}`:''} · Lv.${CU.level||1} · ${CU.xp||0} XP`;const g=(CU.retail&&CU.retail.weeklyGoal)||{};const gs=document.getElementById('goal-sub');if(gs){const parts=[];if(+g.bv)parts.push(`BV ${g.bv}`);if(+g.ibv)parts.push(`IBV ${g.ibv}`);if(+g.income)parts.push(`利潤 $${fmtMoney(g.income)}`);gs.textContent=parts.length?'每週 '+parts.join(' · '):'尚未設定，點擊設定（達標 +50XP）';}const se=document.getElementById('subadmin-entry');if(se){const isSub=CU.role==='subadmin'&&CU.managedSubC;se.style.display=isSub?'flex':'none';if(isSub)document.getElementById('subadmin-sub').textContent=`管理小C：${CU.managedSubC}`;}}
 function openChangeName(){document.getElementById('new-name').value=CU.name||'';om('name-modal');setTimeout(()=>document.getElementById('new-name').focus(),350);}
 async function saveName(){const n=document.getElementById('new-name').value.trim();if(!n)return;CU.name=n;await saveUser();cm('name-modal');renderSet();renderHome();toast('姓名已更新','tg');}
 function openChangePass(target){passTarget=target;document.getElementById('pass-modal-title').textContent=target==='admin'?'修改管理員密碼':'修改密碼';document.getElementById('new-pass').value='';document.getElementById('new-pass2').value='';om('pass-modal');setTimeout(()=>document.getElementById('new-pass').focus(),350);}
@@ -1051,27 +1053,63 @@ function reQuiz(){showCf('重新測驗','重新測驗會保留 XP 和記錄，�
 function exportData(){const blob=new Blob([JSON.stringify(CU,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=`312-dmo-${CU.username}-${dk()}.json`;a.click();URL.revokeObjectURL(url);toast('已匯出','tg');}
 function doLogout(){localStorage.removeItem('dmo_auth');location.href='index.html';}
 /* ADMIN */
+function adminWho(){return IS_ADMIN?ADMIN_UN:(CU?CU.username:'');}
 async function renderAdmin(){
-  document.getElementById('admin-lbl').textContent=ADMIN_UN;
+  const sub=!IS_ADMIN&&CU&&CU.role==='subadmin'&&CU.managedSubC;
+  SUBADMIN_MODE=!!sub;
+  document.getElementById('admin-lbl').textContent=adminWho();
+  // 標題與操作區依身份切換
+  document.getElementById('admin-title').textContent=sub?'小C 管理後台':'管理後台';
+  document.getElementById('admin-badge').textContent=sub?'小C':'ADMIN';
+  document.getElementById('admin-badge').style.background=sub?'var(--purple-dim)':'';
+  document.getElementById('admin-pass-row').style.display=sub?'none':'flex';
+  document.getElementById('admin-logout-row').style.display=sub?'none':'flex';
+  document.getElementById('subadmin-back-row').style.display=sub?'flex':'none';
+  document.getElementById('admin-ops-lbl').textContent=sub?'操作':'管理員操作';
   const{collection,getDocs}=window.FB;
   const snap=await getDocs(collection(window.db,'users'));
-  const allUsers=[];snap.forEach(d=>allUsers.push({...d.data(),username:d.id}));
-  const byL={};allUsers.forEach(u=>{const l=u.leader||'未分組';if(!byL[l])byL[l]=[];byL[l].push(u);});
-  const teams=Object.keys(byL).sort();
+  let allUsers=[];snap.forEach(d=>allUsers.push({...d.data(),username:d.id}));
+  // 小C管理者只看自己 managedSubC 的成員
+  if(sub)allUsers=allUsers.filter(u=>(u.subLeader||'')===CU.managedSubC);
+  // 分組：主管理者用大C分組，小C管理者用小C分組（其實只有一組）
+  const byKey={};allUsers.forEach(u=>{const k=sub?(u.subLeader||'未分組'):(u.leader||'未分組');if(!byKey[k])byKey[k]=[];byKey[k].push(u);});
+  const teams=Object.keys(byKey).sort();
   const today=dk(),totalDone=allUsers.filter(u=>u.days&&u.days[today]&&u.days[today].completed).length;
-  document.getElementById('admin-overview').innerHTML=`<div class="aoi"><div class="aon" style="color:var(--gold)">${allUsers.length}</div><div class="aol">📋 總用戶數</div></div><div class="aoi"><div class="aon" style="color:var(--green)">${totalDone}</div><div class="aol">✅ 今日達標</div></div><div class="aoi"><div class="aon" style="color:var(--purple)">${teams.length}</div><div class="aol">👥 大C 數量</div></div>`;
-  window._abl=byL;
+  document.getElementById('admin-overview').innerHTML=`<div class="aoi"><div class="aon" style="color:var(--gold)">${allUsers.length}</div><div class="aol">📋 ${sub?'小C人數':'總用戶數'}</div></div><div class="aoi"><div class="aon" style="color:var(--green)">${totalDone}</div><div class="aol">✅ 今日達標</div></div><div class="aoi"><div class="aon" style="color:var(--purple)">${teams.length}</div><div class="aol">👥 ${sub?'小C組':'大C 數量'}</div></div>`;
+  window._abl=byKey;
   document.getElementById('admin-tabs').innerHTML=['ALL',...teams].map(t=>`<div class="at ${t===adminAT?'active':''}" onclick="setAT('${t}')">${t==='ALL'?'全部':t}</div>`).join('');
-  renderAdminContent(byL,adminAT==='ALL'?null:adminAT);
+  renderAdminContent(byKey,adminAT==='ALL'?null:adminAT,sub);
   renderSalesSummary();
 }
-function setAT(team){adminAT=team;document.querySelectorAll('.at').forEach(t=>t.classList.toggle('active',t.textContent===(team==='ALL'?'全部':team)));renderAdminContent(window._abl,team==='ALL'?null:team);}
-function renderAdminContent(byL,filter){
+function setAT(team){adminAT=team;document.querySelectorAll('#admin-tabs .at').forEach(t=>t.classList.toggle('active',t.textContent===(team==='ALL'?'全部':team)));renderAdminContent(window._abl,team==='ALL'?null:team,SUBADMIN_MODE);}
+function renderAdminContent(byL,filter,sub){
   const teams=filter?[filter]:Object.keys(byL).sort();const today=dk();
-  document.getElementById('admin-content').innerHTML=teams.length?teams.map(leader=>{const users=byL[leader]||[],done=users.filter(u=>u.days&&u.days[today]&&u.days[today].completed).length;return`<div class="ats"><div class="ath"><div class="atn">👥 大C：${leader}</div><div style="display:flex;gap:6px;flex-wrap:wrap"><span class="pill purple">${users.length}人</span><span class="pill green">${done}達標</span></div></div>${users.map(u=>{const ch=CHARS[u.charId]||CHARS.resonator,d=u.days&&u.days[today],p3=d?(d.actions||[]).filter(a=>a.type===3&&a.done).length:0,p1=d?(d.actions||[]).filter(a=>a.type===1&&a.done).length:0,p2=d?(d.actions||[]).filter(a=>a.type===2&&a.done).length:0;return`<div class="aur"><div style="font-size:1.4rem;flex-shrink:0">${ch.emoji}</div><div class="auri"><div class="aurna">${esc(u.name)} <span style="font-size:.6rem;color:var(--muted2);font-weight:400">${u.username}</span></div><div class="aursu">${u.region} · Lv.${u.level||1} · ${u.xp||0}XP · ${d&&d.completed?'✅今日達標':`⏳ ${p3}-${p1}-${p2}`}<br>加入：${(u.createdAt||'').slice(0,10)}</div></div><div class="auba"><button class="abtn" style="background:var(--green-dim);border-color:rgba(34,211,122,.3);color:var(--green2)" onclick="openLedgerModal('${u.username}')">📒 帳本</button><button class="abtn reset" onclick="adminReset('${u.username}','${esc(u.name)}')">重置XP</button><button class="abtn del" onclick="adminDel('${u.username}','${esc(u.name)}')">刪除</button></div></div>`;}).join('')}</div>`;}).join(''):'<div style="color:var(--muted);font-size:.85rem;padding:20px 0;text-align:center">尚無用戶資料</div>';
+  const grpLabel=sub?'小C':'大C';
+  document.getElementById('admin-content').innerHTML=teams.length?teams.map(leader=>{const users=byL[leader]||[],done=users.filter(u=>u.days&&u.days[today]&&u.days[today].completed).length;return`<div class="ats"><div class="ath"><div class="atn">👥 ${grpLabel}：${esc(leader)}</div><div style="display:flex;gap:6px;flex-wrap:wrap"><span class="pill purple">${users.length}人</span><span class="pill green">${done}達標</span></div></div>${users.map(u=>{const ch=CHARS[u.charId]||CHARS.resonator,d=u.days&&u.days[today],p3=d?(d.actions||[]).filter(a=>a.type===3&&a.done).length:0,p1=d?(d.actions||[]).filter(a=>a.type===1&&a.done).length:0,p2=d?(d.actions||[]).filter(a=>a.type===2&&a.done).length:0;const subTag=u.role==='subadmin'?` <span class="pill purple" style="font-size:.5rem">小C管理</span>`:'';
+  // 主管理者：帳本+指定小C管理+重置+刪除；小C管理者：只有帳本
+  const btns=sub?`<button class="abtn" style="background:var(--green-dim);border-color:rgba(34,211,122,.3);color:var(--green2)" onclick="openLedgerModal('${u.username}')">📒 帳本</button>`:`<button class="abtn" style="background:var(--green-dim);border-color:rgba(34,211,122,.3);color:var(--green2)" onclick="openLedgerModal('${u.username}')">📒 帳本</button><button class="abtn" style="background:var(--purple-dim);border-color:rgba(176,110,255,.3);color:var(--purple2)" onclick="openManageSub('${u.username}','${esc(u.name)}')">🛡️ 小C權限</button><button class="abtn reset" onclick="adminReset('${u.username}','${esc(u.name)}')">重置XP</button><button class="abtn del" onclick="adminDel('${u.username}','${esc(u.name)}')">刪除</button>`;
+  return`<div class="aur"><div style="font-size:1.4rem;flex-shrink:0">${ch.emoji}</div><div class="auri"><div class="aurna">${esc(u.name)} <span style="font-size:.6rem;color:var(--muted2);font-weight:400">${u.username}</span>${subTag}</div><div class="aursu">${esc(u.region||'')} · Lv.${u.level||1} · ${u.xp||0}XP · ${d&&d.completed?'✅今日達標':`⏳ ${p3}-${p1}-${p2}`}${!sub&&u.subLeader?` · 小C：${esc(u.subLeader)}`:''}<br>加入：${(u.createdAt||'').slice(0,10)}</div></div><div class="auba">${btns}</div></div>`;}).join('')}</div>`;}).join(''):'<div style="color:var(--muted);font-size:.85rem;padding:20px 0;text-align:center">尚無用戶資料</div>';
 }
 function adminReset(username,name){showCf(`重置 ${name} 的 XP`,`確定要重置「${name}」的等級和 XP 嗎？行動記錄會保留。`,async()=>{const{doc,updateDoc}=window.FB;await updateDoc(doc(window.db,'users',username),{xp:0,level:1,timeline:[]});toast(`已重置 ${name} 的 XP`,'tb');renderAdmin();});}
 function adminDel(username,name){showCf(`刪除用戶 ${name}`,`確定要永久刪除「${name}」的所有資料嗎？此動作無法還原！`,async()=>{const{doc,deleteDoc}=window.FB;await deleteDoc(doc(window.db,'users',username));toast(`已刪除 ${name}`,'tr');renderAdmin();});}
+/* 指定小C管理者（僅主管理者） */
+function openManageSub(username,name){
+  const u=(window._abl?Object.values(window._abl).flat():[]).find(x=>x.username===username);if(!u)return;
+  const sc=u.subLeader||'';
+  if(!sc){toast(`${name} 沒有所屬小C，無法指定`,'to');return;}
+  const isSub=u.role==='subadmin'&&u.managedSubC===sc;
+  if(isSub){
+    showCf(`取消 ${name} 的小C管理權`,`確定取消「${name}」對小C「${sc}」的管理權限嗎？`,async()=>{
+      const{doc,updateDoc}=window.FB;await updateDoc(doc(window.db,'users',username),{role:'member',managedSubC:''});
+      toast(`已取消 ${name} 的小C管理權`,'tb');renderAdmin();
+    });
+  }else{
+    showCf(`指定 ${name} 為小C管理者`,`將「${name}」設為小C「${sc}」的管理者？他可以查看同小C店主的銷售明細（不含顧客姓名），但不能重置或刪除帳號。`,async()=>{
+      const{doc,updateDoc}=window.FB;await updateDoc(doc(window.db,'users',username),{role:'subadmin',managedSubC:sc});
+      toast(`✓ ${name} 已成為小C「${sc}」管理者`,'tg');renderAdmin();
+    });
+  }
+}
 /* ADMIN 帳本（不含顧客姓名） */
 let ledUser=null;
 function openLedgerModal(username){
@@ -1089,7 +1127,7 @@ function salesToCsv(rows){const head=['店主','店主帳號','地區','大C','�
 function dlCsv(csv,fname){const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=fname;a.click();URL.revokeObjectURL(url);}
 function userSaleRows(u){return uSales(u).map(s=>[u.name,u.username,u.region||'',u.leader||'',s.item,s.date||'',s.price,s.cost,profitOf(s),+s.bv||0,+s.ibv||0]);}
 function exportOneCsv(){if(!ledUser)return;const rows=userSaleRows(ledUser);if(!rows.length){toast('此店主沒有銷售記錄','to');return;}dlCsv(salesToCsv(rows),`帳本-${ledUser.name}-${dk()}.csv`);toast('已下載 CSV','tg');}
-function exportAllCsv(){const all=window._abl?Object.values(window._abl).flat():[];const rows=[];all.forEach(u=>rows.push(...userSaleRows(u)));if(!rows.length){toast('目前沒有任何銷售記錄','to');return;}dlCsv(salesToCsv(rows),`全團隊銷售總表-${dk()}.csv`);toast(`已下載 ${rows.length} 筆銷售`,'tg');}
+function exportAllCsv(){const all=window._abl?Object.values(window._abl).flat():[];const rows=[];all.forEach(u=>rows.push(...userSaleRows(u)));if(!rows.length){toast('目前沒有任何銷售記錄','to');return;}const fn=SUBADMIN_MODE?`小C-${CU.managedSubC}-銷售總表-${dk()}.csv`:`全團隊銷售總表-${dk()}.csv`;dlCsv(salesToCsv(rows),fn);toast(`已下載 ${rows.length} 筆銷售`,'tg');}
 function renderSalesSummary(){
   const all=window._abl?Object.values(window._abl).flat():[];
   const rank=all.map(u=>({name:u.name,region:u.region||'',prof:sumProfit(uSales(u)),bv:sumBV(uSales(u)),cnt:uSales(u).length})).filter(x=>x.cnt>0).sort((a,b)=>b.prof-a.prof);
@@ -1103,7 +1141,7 @@ function renderSalesSummary(){
 /* PAGE/SCREEN */
 function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('open'));document.getElementById(id).classList.add('open');}
 function hideAllScreens(){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('open'));}
-function goPage(name){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.nb').forEach(b=>b.classList.remove('active'));document.getElementById('page-'+name).classList.add('active');const nb=document.getElementById('nav-'+name);if(nb)nb.classList.add('active');document.getElementById('scroll-area').scrollTop=0;if(name==='stats')renderStats();if(name==='team')renderTeam();if(name==='settings')renderSet();if(name==='admin')renderAdmin();}
+function goPage(name){if(name==='admin'&&!IS_ADMIN&&!(CU&&CU.role==='subadmin'&&CU.managedSubC)){toast('沒有後台權限','tr');return;}document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.nb').forEach(b=>b.classList.remove('active'));document.getElementById('page-'+name).classList.add('active');const nb=document.getElementById('nav-'+name);if(nb)nb.classList.add('active');document.getElementById('scroll-area').scrollTop=0;if(name==='stats')renderStats();if(name==='team')renderTeam();if(name==='settings')renderSet();if(name==='admin')renderAdmin();}
 function om(id){document.getElementById(id).classList.add('open');}
 function cm(id){document.getElementById(id).classList.remove('open');}
 function cmc(id,e){if(e.target===document.getElementById(id))cm(id);}
