@@ -416,7 +416,7 @@ nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-w
         <div class="setr" onclick="exportData()"><div class="seti">📤</div><div class="setii"><div class="setn">匯出我的記錄</div><div class="sets">下載 JSON 備份</div></div><div style="color:var(--muted);font-size:.8rem">›</div></div>
         <div class="setr" onclick="doLogout()"><div class="seti">🚪</div><div class="setii"><div class="setn">登出</div><div class="sets">返回登入頁面</div></div><div style="color:var(--muted);font-size:.8rem">›</div></div>
         <div class="card" style="text-align:center;margin-top:4px;padding:24px">
-          <div style="font-family:var(--orb);font-size:1.1rem;background:linear-gradient(135deg,var(--gold),var(--purple2));-webkit-background-clip:text;-webkit-text-fill-color:transparent">3-1-2 DMO v3.1</div>
+          <div style="font-family:var(--orb);font-size:1.1rem;background:linear-gradient(135deg,var(--gold),var(--purple2));-webkit-background-clip:text;-webkit-text-fill-color:transparent">3-1-2 DMO v3.2</div>
           <div style="font-size:.66rem;color:var(--muted);margin-top:10px;line-height:1.8">成功不是靠爆發，而是靠每天重複簡單動作<br><span style="color:var(--gold)">流量</span> · <span style="color:var(--blue)">曝光</span> · <span style="color:var(--purple)">跟進</span></div>
         </div>
       </div>
@@ -485,7 +485,8 @@ nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-w
   <div class="ms"><div class="mh"></div><div class="mt" id="sale-title">記錄銷售</div>
     <div class="il">品項 *</div><input class="inp" id="s-item" placeholder="例：OPC-3、魚油" maxlength="30">
     <div style="display:flex;gap:8px"><div style="flex:1"><div class="il">成交價 *</div><input class="inp" id="s-price" type="number" inputmode="decimal" placeholder="1500" oninput="calcProfit()"></div><div style="flex:1"><div class="il">成本 *</div><input class="inp" id="s-cost" type="number" inputmode="decimal" placeholder="1100" oninput="calcProfit()"></div></div>
-    <div style="display:flex;gap:8px"><div style="flex:1"><div class="il">BV 分數 *</div><input class="inp" id="s-bv" type="number" inputmode="decimal" placeholder="25"></div><div style="flex:1"><div class="il">零售價（參考）</div><input class="inp" id="s-srp" type="number" inputmode="decimal" placeholder="選填"></div></div>
+    <div style="display:flex;gap:8px"><div style="flex:1"><div class="il">BV 分數 *</div><input class="inp" id="s-bv" type="number" inputmode="decimal" placeholder="25"></div><div style="flex:1"><div class="il">IBV 分數</div><input class="inp" id="s-ibv" type="number" inputmode="decimal" placeholder="選填"></div></div>
+    <div class="il">零售價（參考，選填）</div><input class="inp" id="s-srp" type="number" inputmode="decimal" placeholder="建議售價">
     <div class="il">顧客（選填）</div><input class="inp" id="s-cust" placeholder="例：王小姐" maxlength="20">
     <div style="display:flex;gap:8px"><div style="flex:1"><div class="il">售出日期</div><input class="inp" id="s-date" type="date" style="color-scheme:dark"></div><div style="flex:1"><div class="il">關懷提醒日（選填）</div><input class="inp" id="s-care" type="date" style="color-scheme:dark"></div></div>
     <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:var(--green-dim);border:1px solid rgba(34,211,122,.2);border-radius:var(--r-sm);margin-bottom:14px"><span style="font-size:.75rem;color:var(--muted2)">零售利潤（成交價−成本）</span><span style="font-family:var(--orb);font-size:1.1rem;color:var(--green2)" id="s-profit">$0</span></div>
@@ -495,8 +496,9 @@ nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-w
 <div class="mb" id="goal-modal" onclick="cmc('goal-modal',event)">
   <div class="ms"><div class="mh"></div><div class="mt">每週零售目標</div>
     <div class="il">每週 BV 目標</div><input class="inp" id="g-bv" type="number" inputmode="numeric" placeholder="例：100（填 0 表示不設定）">
+    <div class="il">每週 IBV 目標</div><input class="inp" id="g-ibv" type="number" inputmode="numeric" placeholder="例：50（填 0 表示不設定）">
     <div class="il">每週利潤目標（元）</div><input class="inp" id="g-income" type="number" inputmode="numeric" placeholder="例：3000（填 0 表示不設定）">
-    <div style="font-size:.68rem;color:var(--muted2);line-height:1.6;margin-bottom:14px">💡 週一重新計算，設定的目標全部達成時獲得 <span style="color:var(--gold)">+50 XP</span> 獎勵（每週一次）</div>
+    <div style="font-size:.68rem;color:var(--muted2);line-height:1.6;margin-bottom:14px">💡 可只設定其中一項，或多項同時設定。週一重新計算，已設定的目標全部達成時獲得 <span style="color:var(--gold)">+50 XP</span> 獎勵（每週一次）</div>
     <div class="mr"><button class="btn btn-ghost" style="width:auto;padding:12px 20px" onclick="cm('goal-modal')">取消</button><button class="btn btn-gold" onclick="saveGoal()">儲存目標 ✓</button></div>
   </div>
 </div>
@@ -794,30 +796,32 @@ function delActCf(){showCf('刪除記錄','確定要刪除這筆記錄嗎？',as
 });}
 /* RETAIL */
 let editSid=null,lbMode='all';
-function retail(){if(!CU.retail)CU.retail={};const r=CU.retail;if(!r.weeklyGoal)r.weeklyGoal={bv:0,income:0};if(!r.sales)r.sales=[];if(!r.bonusWeeks)r.bonusWeeks={};if(r.recommend===undefined)r.recommend='';return r;}
+function retail(){if(!CU.retail)CU.retail={};const r=CU.retail;if(!r.weeklyGoal)r.weeklyGoal={bv:0,ibv:0,income:0};if(r.weeklyGoal.ibv===undefined)r.weeklyGoal.ibv=0;if(!r.sales)r.sales=[];if(!r.bonusWeeks)r.bonusWeeks={};if(r.recommend===undefined)r.recommend='';return r;}
 function mondayOf(d){const x=new Date(d);x.setDate(x.getDate()-((x.getDay()+6)%7));return`${x.getFullYear()}-${String(x.getMonth()+1).padStart(2,'0')}-${String(x.getDate()).padStart(2,'0')}`;}
 function fmtMoney(n){return(+n||0).toLocaleString('zh-TW');}
 function uSales(u){return(u&&u.retail&&u.retail.sales)||[];}
 function profitOf(s){return(+s.price||0)-(+s.cost||0);}
 function sumProfit(a){return a.reduce((t,s)=>t+profitOf(s),0);}
 function sumBV(a){return a.reduce((t,s)=>t+(+s.bv||0),0);}
+function sumIBV(a){return a.reduce((t,s)=>t+(+s.ibv||0),0);}
 function weekSales(u){const m=mondayOf(new Date());return uSales(u||CU).filter(s=>(s.date||'')>=m);}
 function renderRetail(){
   const el=document.getElementById('retail-week');if(!el)return;
-  const r=retail(),ws=weekSales(),wp=sumProfit(ws),wb=sumBV(ws),g=r.weeklyGoal||{};
+  const r=retail(),ws=weekSales(),wp=sumProfit(ws),wb=sumBV(ws),wi=sumIBV(ws),g=r.weeklyGoal||{};
   document.getElementById('acR').textContent='$'+fmtMoney(wp);
   const bar=(label,val,goal,col,money)=>{const vT=money?'$'+fmtMoney(val):val,gT=money?'$'+fmtMoney(goal):goal;if(goal>0){const pct=Math.min(100,Math.round(val/goal*100));return`<div style="margin-bottom:8px"><div class="xpr"><span>${label}</span><span>${vT} / ${gT}（${pct}%）</span></div><div class="xpt" style="height:8px"><div class="xpb" style="width:${pct}%;background:linear-gradient(90deg,${col},${col}aa)"></div></div></div>`;}return`<div style="display:flex;justify-content:space-between;font-size:.74rem;color:var(--muted2);margin-bottom:6px;font-family:var(--mono)"><span>${label}</span><span style="color:${col}">${vT}</span></div>`;};
-  el.innerHTML=`<div class="card" style="margin-bottom:6px">${bar('本週利潤',wp,+g.income||0,'var(--green2)',true)}${bar('本週 BV',wb,+g.bv||0,'var(--gold)',false)}<div style="font-size:.62rem;color:var(--muted);margin-top:2px">本週 ${ws.length} 筆${(+g.bv||+g.income)?'':' · 到「設定」訂每週目標可拿達標獎勵'}</div></div>`;
+  el.innerHTML=`<div class="card" style="margin-bottom:6px">${bar('本週利潤',wp,+g.income||0,'var(--green2)',true)}${bar('本週 BV',wb,+g.bv||0,'var(--gold)',false)}${(+g.ibv||wi)?bar('本週 IBV',wi,+g.ibv||0,'var(--blue)',false):''}<div style="font-size:.62rem;color:var(--muted);margin-top:2px">本週 ${ws.length} 筆${(+g.bv||+g.ibv||+g.income)?'':' · 到「設定」訂每週目標可拿達標獎勵'}</div></div>`;
 }
 function openSale(sid){
   editSid=sid||null;
-  const r=retail();let s={item:'',srp:'',price:'',cost:'',bv:'',customer:'',date:dk(),careDate:''};
+  const r=retail();let s={item:'',srp:'',price:'',cost:'',bv:'',ibv:'',customer:'',date:dk(),careDate:''};
   if(sid){const f=r.sales.find(x=>x.id===sid);if(f)s={...f};}
   document.getElementById('sale-title').textContent=sid?'編輯銷售':'記錄銷售';
   document.getElementById('s-item').value=s.item||'';
   document.getElementById('s-price').value=s.price??'';
   document.getElementById('s-cost').value=s.cost??'';
   document.getElementById('s-bv').value=s.bv??'';
+  document.getElementById('s-ibv').value=s.ibv??'';
   document.getElementById('s-srp').value=s.srp??'';
   document.getElementById('s-cust').value=s.customer||'';
   document.getElementById('s-date').value=s.date||dk();
@@ -835,6 +839,7 @@ async function saveSale(){
   if(cv===''||isNaN(+cv)){toast('請輸入成本','tr');return;}
   if(bvv===''||isNaN(+bvv)||+bvv<0){toast('請輸入 BV 分數','tr');return;}
   const price=+pv,cost=+cv,bv=+bvv;
+  const ibv=document.getElementById('s-ibv').value===''?0:+document.getElementById('s-ibv').value;
   const srp=document.getElementById('s-srp').value===''?'':+document.getElementById('s-srp').value;
   const customer=document.getElementById('s-cust').value.trim();
   const date=document.getElementById('s-date').value||dk();
@@ -843,11 +848,11 @@ async function saveSale(){
   if(editSid){
     const s=r.sales.find(x=>x.id===editSid);if(!s)return;
     const oldBV=+s.bv||0;
-    Object.assign(s,{item,srp,price,cost,bv,customer,date,careDate});
+    Object.assign(s,{item,srp,price,cost,bv,ibv,customer,date,careDate});
     CU.xp=Math.max(0,(CU.xp||0)+(bv-oldBV));
     toast('✓ 銷售已更新','tg');
   }else{
-    r.sales.push({id:uid(),item,srp,price,cost,bv,customer,date,careDate,ts:Date.now()});
+    r.sales.push({id:uid(),item,srp,price,cost,bv,ibv,customer,date,careDate,ts:Date.now()});
     CU.xp=(CU.xp||0)+bv;
     addTL('💰',`賣出 ${item}，利潤 $${fmtMoney(price-cost)}`);
     toast(`✓ 已記錄銷售 +${bv}XP`,'tg');snd('check');
@@ -866,37 +871,42 @@ function delSaleCf(){showCf('刪除銷售','確定刪除這筆銷售嗎？對應
   toast('已刪除','tg');
 });}
 function checkWeekGoal(){
-  const r=retail(),g=r.weeklyGoal||{},tBV=+g.bv||0,tInc=+g.income||0;
-  if(!tBV&&!tInc)return;
+  const r=retail(),g=r.weeklyGoal||{},tBV=+g.bv||0,tIBV=+g.ibv||0,tInc=+g.income||0;
+  if(!tBV&&!tIBV&&!tInc)return;
   const wk=mondayOf(new Date());
   if(r.bonusWeeks[wk])return;
   const ws=weekSales();
-  if((!tBV||sumBV(ws)>=tBV)&&(!tInc||sumProfit(ws)>=tInc)){
+  if((!tBV||sumBV(ws)>=tBV)&&(!tIBV||sumIBV(ws)>=tIBV)&&(!tInc||sumProfit(ws)>=tInc)){
     r.bonusWeeks[wk]=true;CU.xp=(CU.xp||0)+50;
     addTL('🏅','本週零售目標達成！+50XP');
     setTimeout(()=>{toast('🏅 本週零售目標達成 +50XP','to');snd('complete');},700);
   }
 }
-function openGoal(){const g=retail().weeklyGoal||{};document.getElementById('g-bv').value=g.bv||'';document.getElementById('g-income').value=g.income||'';om('goal-modal');}
-async function saveGoal(){const r=retail();r.weeklyGoal={bv:+document.getElementById('g-bv').value||0,income:+document.getElementById('g-income').value||0};checkWeekGoal();await saveUser();cm('goal-modal');renderSet();renderRetail();toast('週目標已更新','tg');}
+function openGoal(){const g=retail().weeklyGoal||{};document.getElementById('g-bv').value=g.bv||'';document.getElementById('g-ibv').value=g.ibv||'';document.getElementById('g-income').value=g.income||'';om('goal-modal');}
+async function saveGoal(){const r=retail();r.weeklyGoal={bv:+document.getElementById('g-bv').value||0,ibv:+document.getElementById('g-ibv').value||0,income:+document.getElementById('g-income').value||0};checkWeekGoal();await saveUser();cm('goal-modal');renderSet();renderRetail();toast('週目標已更新','tg');}
 function renderLedger(){
   const sEl=document.getElementById('ledger-sum'),lEl=document.getElementById('ledger-list');if(!sEl)return;
   const all=[...retail().sales].sort((a,b)=>(b.date||'').localeCompare(a.date||'')||((b.ts||0)-(a.ts||0)));
   const tp=sumProfit(all),tb=sumBV(all);
   sEl.innerHTML=`<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center"><div><div style="font-family:var(--orb);font-size:1.1rem;color:var(--green2)">$${fmtMoney(tp)}</div><div style="font-size:.56rem;color:var(--muted2)">累積利潤</div></div><div><div style="font-family:var(--orb);font-size:1.1rem;color:var(--gold)">${fmtMoney(tb)}</div><div style="font-size:.56rem;color:var(--muted2)">累積 BV</div></div><div><div style="font-family:var(--orb);font-size:1.1rem;color:var(--blue)">${all.length}</div><div style="font-size:.56rem;color:var(--muted2)">銷售筆數</div></div></div>`;
-  lEl.innerHTML=all.slice(0,15).map(s=>`<div class="ai"><div class="ab"><div class="an">💰 ${esc(s.item)}${s.customer?` <span style="font-size:.64rem;color:var(--muted2)">→ ${esc(s.customer)}</span>`:''}</div><div class="ano">${esc(s.date||'')} · BV ${+s.bv||0}${s.careDate?` · 🔔 ${esc(s.careDate)} 關懷`:''}</div></div><div class="axp" style="color:${profitOf(s)>=0?'var(--green2)':'var(--red)'};background:var(--green-dim);border-color:rgba(34,211,122,.15)">$${fmtMoney(profitOf(s))}</div><button class="aed" onclick="openSale('${s.id}')">編輯</button></div>`).join('')||'<div class="card" style="text-align:center;color:var(--muted);font-size:.82rem;padding:18px">尚無銷售記錄，到「今日」頁記下第一筆吧！</div>';
+  lEl.innerHTML=all.slice(0,15).map(s=>`<div class="ai"><div class="ab"><div class="an">💰 ${esc(s.item)}${s.customer?` <span style="font-size:.64rem;color:var(--muted2)">→ ${esc(s.customer)}</span>`:''}</div><div class="ano">${esc(s.date||'')} · BV ${+s.bv||0}${+s.ibv?` · IBV ${+s.ibv}`:''}${s.careDate?` · 🔔 ${esc(s.careDate)} 關懷`:''}</div></div><div class="axp" style="color:${profitOf(s)>=0?'var(--green2)':'var(--red)'};background:var(--green-dim);border-color:rgba(34,211,122,.15)">$${fmtMoney(profitOf(s))}</div><button class="aed" onclick="openSale('${s.id}')">編輯</button></div>`).join('')||'<div class="card" style="text-align:center;color:var(--muted);font-size:.82rem;padding:18px">尚無銷售記錄，到「今日」頁記下第一筆吧！</div>';
 }
 /* COPY REPORT */
 function openCopy(){document.getElementById('copy-rec').value=retail().recommend||'';buildCopy();om('copy-modal');}
 function buildCopy(){
   const ch=CHARS[CU.charId]||CHARS.resonator,ac=dobj().actions||[];
-  const grp=t=>{const m={};ac.filter(a=>a.type===t).forEach(a=>{m[a.name]=(m[a.name]||0)+1;});const e=Object.entries(m);return e.length?e.map(([n,c])=>c>1?`${n}×${c}`:n).join('、'):'—';};
+  const grp=t=>{const m={};ac.filter(a=>a.type===t).forEach(a=>{m[a.name]=(m[a.name]||0)+1;});const e=Object.entries(m);return e.length?e.map(([n,c])=>c>1?`${n}×${c}`:n).join('、'):'';};
   const d3=ac.filter(a=>a.type===3).length,d1=ac.filter(a=>a.type===1).length,d2=ac.filter(a=>a.type===2).length;
   const wp=sumProfit(weekSales()),rec=document.getElementById('copy-rec').value.trim();
-  let t=`我是 ${CU.name}（${ch.name}），今日 3-1-2 完成：\n🌊 接觸 ${d3}/3：${grp(3)}\n📣 曝光 ${d1}/1：${grp(1)}\n🔄 跟進 ${d2}/2：${grp(2)}`;
-  if(wp>0)t+=`\n💰 這週累積賺取了 ${fmtMoney(wp)} 元`;
-  if(rec)t+=`\n🎁 我想推薦「${rec}」給大家，一起增加收入！`;
-  t+=`\n🔥 連續達標 ${streak()} 天 · Lv.${CU.level||1} ${ch.levelTitles[Math.min(Math.floor(((CU.level||1)-1)/4),4)]}`;
+  const lv=CU.level||1,ti=ch.levelTitles[Math.min(Math.floor((lv-1)/4),4)];
+  const allDone=d3>=3&&d1>=1&&d2>=2;
+  let t=`🔥 我是 ${CU.name}，${ch.name} Lv.${lv}\n`;
+  t+=allDone?`今日 3-1-2 全部達標 ✅\n`:`今日 3-1-2 進度：\n`;
+  const seg=(emoji,label,n,need,detail)=>`${emoji} ${label} ${n}/${need}${n>=need?'✅':''}${detail?`：${detail}`:''}`;
+  t+=`${seg('🌊','接觸',d3,3,grp(3))}\n${seg('📣','曝光',d1,1,grp(1))}\n${seg('🔄','跟進',d2,2,grp(2))}\n`;
+  if(wp>0)t+=`💰 本週累積賺取 ${fmtMoney(wp)} 元\n`;
+  if(rec)t+=`🎁 推薦「${rec}」給大家，一起賺！\n`;
+  t+=`連續打卡 ${streak()} 天，${ti}，一起衝 💪`;
   document.getElementById('copy-text').value=t;
 }
 async function copyReport(){
@@ -986,7 +996,7 @@ function calcMS(m){let s=0;const d=new Date();for(let i=0;i<365;i++){const k=`${
 function m3d(v,t,l){const cls=v>=t?'full':v>0?'part':'';return`<div class="m3d ${cls}"><div class="m3v">${v}/${t}</div><div class="m3k">${l}</div></div>`;}
 function cheer(e,name){e.stopPropagation();toast(`💪 為 ${name} 打氣！加油衝！`,'tp');snd('check');}
 /* SETTINGS */
-function renderSet(){if(!CU)return;const ch=CHARS[CU.charId]||CHARS.resonator;document.getElementById('sr-icon').textContent=ch.emoji;document.getElementById('sr-name').textContent=`${CU.name}（${CU.username}）`;document.getElementById('sr-sub').textContent=`${CU.region} · 大C：${CU.leader} · Lv.${CU.level||1} · ${CU.xp||0} XP`;const g=(CU.retail&&CU.retail.weeklyGoal)||{};const gs=document.getElementById('goal-sub');if(gs)gs.textContent=(+g.bv||+g.income)?`每週 BV ${g.bv||0} · 利潤 $${fmtMoney(g.income||0)}`:'尚未設定，點擊設定（達標 +50XP）';}
+function renderSet(){if(!CU)return;const ch=CHARS[CU.charId]||CHARS.resonator;document.getElementById('sr-icon').textContent=ch.emoji;document.getElementById('sr-name').textContent=`${CU.name}（${CU.username}）`;document.getElementById('sr-sub').textContent=`${CU.region} · 大C：${CU.leader} · Lv.${CU.level||1} · ${CU.xp||0} XP`;const g=(CU.retail&&CU.retail.weeklyGoal)||{};const gs=document.getElementById('goal-sub');if(gs){const parts=[];if(+g.bv)parts.push(`BV ${g.bv}`);if(+g.ibv)parts.push(`IBV ${g.ibv}`);if(+g.income)parts.push(`利潤 $${fmtMoney(g.income)}`);gs.textContent=parts.length?'每週 '+parts.join(' · '):'尚未設定，點擊設定（達標 +50XP）';}}
 function openChangeName(){document.getElementById('new-name').value=CU.name||'';om('name-modal');setTimeout(()=>document.getElementById('new-name').focus(),350);}
 async function saveName(){const n=document.getElementById('new-name').value.trim();if(!n)return;CU.name=n;await saveUser();cm('name-modal');renderSet();renderHome();toast('姓名已更新','tg');}
 function openChangePass(target){passTarget=target;document.getElementById('pass-modal-title').textContent=target==='admin'?'修改管理員密碼':'修改密碼';document.getElementById('new-pass').value='';document.getElementById('new-pass2').value='';om('pass-modal');setTimeout(()=>document.getElementById('new-pass').focus(),350);}
