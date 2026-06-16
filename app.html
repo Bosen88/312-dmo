@@ -231,6 +231,8 @@ nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-w
 .tc{padding:10px 4px;border-radius:var(--r-sm);border:1px solid var(--border);background:rgba(255,255,255,.02);text-align:center;cursor:pointer;transition:all .2s}
 .care-chip.on{background:var(--green-dim);border-color:rgba(34,211,122,.4)}
 .care-chip:not(.on){opacity:.4}
+.stype-chip.on{background:var(--gold-dim);border-color:rgba(245,200,66,.45)}
+.stype-chip:not(.on){opacity:.45}
 .tci{font-size:1.1rem;margin-bottom:4px}.tcl{font-size:.62rem;color:var(--muted2)}
 .tc3{border-color:var(--gold);background:var(--gold-dim)}.tc3 .tcl{color:var(--gold2)}
 .tc1{border-color:var(--blue);background:var(--blue-dim)}.tc1 .tcl{color:var(--blue)}
@@ -434,7 +436,7 @@ nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-w
         <div class="setr" onclick="exportData()"><div class="seti">📤</div><div class="setii"><div class="setn">匯出我的記錄</div><div class="sets">下載 JSON 備份</div></div><div style="color:var(--muted);font-size:.8rem">›</div></div>
         <div class="setr" onclick="doLogout()"><div class="seti">🚪</div><div class="setii"><div class="setn">登出</div><div class="sets">返回登入頁面</div></div><div style="color:var(--muted);font-size:.8rem">›</div></div>
         <div class="card" style="text-align:center;margin-top:4px;padding:24px">
-          <div style="font-family:var(--orb);font-size:1.1rem;background:linear-gradient(135deg,var(--gold),var(--purple2));-webkit-background-clip:text;-webkit-text-fill-color:transparent">3-1-2 DMO v3.9</div>
+          <div style="font-family:var(--orb);font-size:1.1rem;background:linear-gradient(135deg,var(--gold),var(--purple2));-webkit-background-clip:text;-webkit-text-fill-color:transparent">3-1-2 DMO v4.0</div>
           <div style="font-size:.66rem;color:var(--muted);margin-top:10px;line-height:1.8">成功不是靠爆發，而是靠每天重複簡單動作<br><span style="color:var(--gold)">流量</span> · <span style="color:var(--blue)">曝光</span> · <span style="color:var(--purple)">跟進</span></div>
         </div>
       </div>
@@ -494,8 +496,8 @@ nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-w
   <div class="ms"><div class="mh"></div><div class="mt" id="mg-title">設定月目標</div>
     <div id="mg-cur" style="font-size:.68rem;color:var(--muted2);margin-bottom:12px"></div>
     <div class="il">本月 BV 目標</div><input class="inp" id="mg-bv" type="number" inputmode="numeric" placeholder="例：400（填 0 表示不設定）">
-    <div class="il">本月 IBV 目標</div><input class="inp" id="mg-ibv" type="number" inputmode="numeric" placeholder="例：200（填 0 表示不設定）">
-    <div class="il">本月利潤目標（元）</div><input class="inp" id="mg-income" type="number" inputmode="numeric" placeholder="例：12000（填 0 表示不設定）">
+    <div class="il">本月現金回饋目標（元）</div><input class="inp" id="mg-ibv" type="number" inputmode="numeric" placeholder="例：3000（填 0 表示不設定）">
+    <div class="il">本月總賺取目標（元）</div><input class="inp" id="mg-income" type="number" inputmode="numeric" placeholder="例：12000（填 0 表示不設定）">
     <div style="font-size:.66rem;color:var(--muted2);line-height:1.7;margin-bottom:14px">💡 月目標由你設定，店主自己拆成每週目標。店主達成整月目標可獲得 <span style="color:var(--purple2)">+150 XP</span>（每月一次）。目標只套用當月，跨月需重設。</div>
     <div class="mr"><button class="btn btn-ghost" style="width:auto;padding:12px 20px" onclick="cm('mgoal-modal')">取消</button><button class="btn btn-gold" onclick="saveMonthGoal()">儲存月目標 ✓</button></div>
   </div>
@@ -533,9 +535,22 @@ nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-w
 </div>
 <div class="mb" id="sale-modal" onclick="cmc('sale-modal',event)">
   <div class="ms"><div class="mh"></div><div class="mt" id="sale-title">記錄銷售</div>
-    <div class="il">品項 *</div><input class="inp" id="s-item" placeholder="例：OPC-3、魚油" maxlength="30">
-    <div style="display:flex;gap:8px"><div style="flex:1"><div class="il">成交價 *</div><input class="inp" id="s-price" type="number" inputmode="decimal" placeholder="1500" oninput="calcProfit()"></div><div style="flex:1"><div class="il">成本 *</div><input class="inp" id="s-cost" type="number" inputmode="decimal" placeholder="1100" oninput="calcProfit()"></div></div>
-    <div style="display:flex;gap:8px"><div style="flex:1"><div class="il">BV 分數 *</div><input class="inp" id="s-bv" type="number" inputmode="decimal" placeholder="25"></div><div style="flex:1"><div class="il">IBV 分數</div><input class="inp" id="s-ibv" type="number" inputmode="decimal" placeholder="選填"></div></div>
+    <div class="il">記錄類型</div>
+    <div class="trow" id="stype-chips" style="grid-template-columns:1fr 1fr;margin-bottom:14px">
+      <div class="tc stype-chip on" data-t="bv" onclick="setSType('bv')"><div class="tci">📦</div><div class="tcl">BV 商品</div></div>
+      <div class="tc stype-chip" data-t="ibv" onclick="setSType('ibv')"><div class="tci">💵</div><div class="tcl">IBV 回饋</div></div>
+    </div>
+    <div class="il">商品名稱 *</div><input class="inp" id="s-item" placeholder="例：OPC-3、魚油" maxlength="30">
+    <!-- BV 欄位 -->
+    <div class="stype-bv">
+      <div style="display:flex;gap:8px"><div style="flex:1"><div class="il">成交價 *</div><input class="inp" id="s-price" type="number" inputmode="decimal" placeholder="1500" oninput="calcEarn()"></div><div style="flex:1"><div class="il">成本 *</div><input class="inp" id="s-cost" type="number" inputmode="decimal" placeholder="1100" oninput="calcEarn()"></div></div>
+      <div class="il">BV 分數 *</div><input class="inp" id="s-bv" type="number" inputmode="decimal" placeholder="25">
+    </div>
+    <!-- IBV 欄位 -->
+    <div class="stype-ibv" style="display:none">
+      <div style="display:flex;gap:8px"><div style="flex:1"><div class="il">成交價 *</div><input class="inp" id="si-price" type="number" inputmode="decimal" placeholder="1500" oninput="calcEarn()"></div><div style="flex:1"><div class="il">現金回饋 % *</div><input class="inp" id="si-rate" type="number" inputmode="decimal" placeholder="例：20" oninput="calcEarn()"></div></div>
+      <div class="il">件數 *</div><input class="inp" id="si-qty" type="number" inputmode="numeric" placeholder="1" value="1" oninput="calcEarn()">
+    </div>
     <div class="il">顧客（選填）</div><input class="inp" id="s-cust" placeholder="例：王小姐" maxlength="20">
     <div class="il">售出日期</div><input class="inp" id="s-date" type="date" style="color-scheme:dark" onchange="renderCarePreview()">
     <div class="il">顧客關懷提醒（可複選）</div>
@@ -545,7 +560,7 @@ nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-w
       <div class="tc care-chip on" data-d="30" onclick="toggleCare(30)"><div class="tci">🔄</div><div class="tcl">30天</div></div>
     </div>
     <div id="care-preview" style="font-size:.64rem;color:var(--muted2);line-height:1.7;margin-bottom:12px"></div>
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:var(--green-dim);border:1px solid rgba(34,211,122,.2);border-radius:var(--r-sm);margin-bottom:14px"><span style="font-size:.75rem;color:var(--muted2)">零售利潤（成交價−成本）</span><span style="font-family:var(--orb);font-size:1.1rem;color:var(--green2)" id="s-profit">$0</span></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:var(--green-dim);border:1px solid rgba(34,211,122,.2);border-radius:var(--r-sm);margin-bottom:14px"><span style="font-size:.75rem;color:var(--muted2)" id="s-earn-label">零售利潤（成交價−成本）</span><span style="font-family:var(--orb);font-size:1.1rem;color:var(--green2)" id="s-profit">$0</span></div>
     <div class="mr"><button class="btn btn-danger" id="s-del" style="width:auto;padding:12px 20px;display:none" onclick="delSaleCf()">刪除</button><button class="btn btn-ghost" style="width:auto;padding:12px 20px" onclick="cm('sale-modal')">取消</button><button class="btn btn-gold" onclick="saveSale()">儲存 ✓</button></div>
   </div>
 </div>
@@ -553,8 +568,8 @@ nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-w
   <div class="ms"><div class="mh"></div><div class="mt">每週零售目標</div>
     <div id="goal-month-hint"></div>
     <div class="il">每週 BV 目標</div><input class="inp" id="g-bv" type="number" inputmode="numeric" placeholder="例：100（填 0 表示不設定）">
-    <div class="il">每週 IBV 目標</div><input class="inp" id="g-ibv" type="number" inputmode="numeric" placeholder="例：50（填 0 表示不設定）">
-    <div class="il">每週利潤目標（元）</div><input class="inp" id="g-income" type="number" inputmode="numeric" placeholder="例：3000（填 0 表示不設定）">
+    <div class="il">每週現金回饋目標（元）</div><input class="inp" id="g-ibv" type="number" inputmode="numeric" placeholder="例：800（填 0 表示不設定）">
+    <div class="il">每週總賺取目標（元）</div><input class="inp" id="g-income" type="number" inputmode="numeric" placeholder="例：3000（填 0 表示不設定）">
     <div style="font-size:.68rem;color:var(--muted2);line-height:1.6;margin-bottom:14px">💡 可只設定其中一項，或多項同時設定。週一重新計算，已設定的目標全部達成時獲得 <span style="color:var(--gold)">+50 XP</span> 獎勵（每週一次）</div>
     <div class="mr"><button class="btn btn-ghost" style="width:auto;padding:12px 20px" onclick="cm('goal-modal')">取消</button><button class="btn btn-gold" onclick="saveGoal()">儲存目標 ✓</button></div>
   </div>
@@ -884,23 +899,34 @@ function activeMonthGoal(u){const r=(u||CU).retail||{};const g=r.monthGoal||{};r
 function mondayOf(d){const x=new Date(d);x.setDate(x.getDate()-((x.getDay()+6)%7));return`${x.getFullYear()}-${String(x.getMonth()+1).padStart(2,'0')}-${String(x.getDate()).padStart(2,'0')}`;}
 function fmtMoney(n){return(+n||0).toLocaleString('zh-TW');}
 function uSales(u){return(u&&u.retail&&u.retail.sales)||[];}
-function profitOf(s){return(+s.price||0)-(+s.cost||0);}
-function sumProfit(a){return a.reduce((t,s)=>t+profitOf(s),0);}
+// 記錄類型：明確標 type 用 type；舊資料沒 type 一律當 bv
+function saleType(s){return s.type==='ibv'?'ibv':'bv';}
+// 每筆「賺取」：BV=零售利潤(成交-成本)，IBV=現金回饋(成交價×回饋%×件數)
+function profitOf(s){if(saleType(s)==='ibv')return cashbackOf(s);return(+s.price||0)-(+s.cost||0);}
+function cashbackOf(s){return Math.round((+s.price||0)*(+s.rate||0)/100*(+s.qty||1));}
+function bvProfitOf(s){return saleType(s)==='bv'?((+s.price||0)-(+s.cost||0)):0;}
+function earnOf(s){return profitOf(s);}// 統一賺取口徑（總賺取＝BV利潤＋IBV回饋）
+function sumProfit(a){return a.reduce((t,s)=>t+earnOf(s),0);}// 總賺取
+function sumBVProfit(a){return a.reduce((t,s)=>t+bvProfitOf(s),0);}// 只 BV 零售利潤
+function sumCashback(a){return a.reduce((t,s)=>t+(saleType(s)==='ibv'?cashbackOf(s):0),0);}// 只 IBV 回饋金
 function sumBV(a){return a.reduce((t,s)=>t+(+s.bv||0),0);}
+// IBV 件數加總（取代舊的 IBV 分數）
+function sumQty(a){return a.reduce((t,s)=>t+(saleType(s)==='ibv'?(+s.qty||1):0),0);}
+// 舊 sumIBV 保留給舊資料相容（舊資料的 ibv 分數欄）
 function sumIBV(a){return a.reduce((t,s)=>t+(+s.ibv||0),0);}
 function weekSales(u){const m=mondayOf(new Date());return uSales(u||CU).filter(s=>(s.date||'')>=m);}
 function renderRetail(){
   const el=document.getElementById('retail-week');if(!el)return;
-  const r=retail(),ws=weekSales(),wp=sumProfit(ws),wb=sumBV(ws),wi=sumIBV(ws),g=r.weeklyGoal||{};
+  const r=retail(),ws=weekSales(),wp=sumProfit(ws),wb=sumBV(ws),wcb=sumCashback(ws),g=r.weeklyGoal||{};
   document.getElementById('acR').textContent='$'+fmtMoney(wp);
   const bar=(label,val,goal,col,money)=>{const vT=money?'$'+fmtMoney(val):val,gT=money?'$'+fmtMoney(goal):goal;if(goal>0){const pct=Math.min(100,Math.round(val/goal*100));return`<div style="margin-bottom:8px"><div class="xpr"><span>${label}</span><span>${vT} / ${gT}（${pct}%）</span></div><div class="xpt" style="height:8px"><div class="xpb" style="width:${pct}%;background:linear-gradient(90deg,${col},${col}aa)"></div></div></div>`;}return`<div style="display:flex;justify-content:space-between;font-size:.74rem;color:var(--muted2);margin-bottom:6px;font-family:var(--mono)"><span>${label}</span><span style="color:${col}">${vT}</span></div>`;};
   // 月目標卡
   const mg=activeMonthGoal();let monthHtml='';
   if(mg&&(+mg.bv||+mg.ibv||+mg.income)){
-    const ms=monthSales(),mp=sumProfit(ms),mb=sumBV(ms),mi=sumIBV(ms);
-    monthHtml=`<div class="card" style="margin-bottom:6px;border-color:rgba(176,110,255,.25)"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-family:var(--orb);font-size:.72rem;color:var(--purple2)">📅 ${ymLabel(mg.ym)} 月目標</span><span style="font-size:.56rem;color:var(--muted2)">${mg.setBy?`由 ${esc(mg.setBy)} 指定`:''}</span></div>${(+mg.income)?bar('本月利潤',mp,+mg.income,'var(--purple2)',true):''}${(+mg.bv)?bar('本月 BV',mb,+mg.bv,'var(--purple)',false):''}${(+mg.ibv)?bar('本月 IBV',mi,+mg.ibv,'var(--blue)',false):''}<div style="font-size:.6rem;color:var(--muted);margin-top:2px">達成整月目標 +150XP</div></div>`;
+    const ms=monthSales(),mp=sumProfit(ms),mb=sumBV(ms),mcb=sumCashback(ms);
+    monthHtml=`<div class="card" style="margin-bottom:6px;border-color:rgba(176,110,255,.25)"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-family:var(--orb);font-size:.72rem;color:var(--purple2)">📅 ${ymLabel(mg.ym)} 月目標</span><span style="font-size:.56rem;color:var(--muted2)">${mg.setBy?`由 ${esc(mg.setBy)} 指定`:''}</span></div>${(+mg.income)?bar('本月總賺取',mp,+mg.income,'var(--purple2)',true):''}${(+mg.bv)?bar('本月 BV',mb,+mg.bv,'var(--purple)',false):''}${(+mg.ibv)?bar('本月現金回饋',mcb,+mg.ibv,'var(--blue)',true):''}<div style="font-size:.6rem;color:var(--muted);margin-top:2px">達成整月目標 +150XP</div></div>`;
   }
-  el.innerHTML=monthHtml+`<div class="card" style="margin-bottom:6px">${bar('本週利潤',wp,+g.income||0,'var(--green2)',true)}${bar('本週 BV',wb,+g.bv||0,'var(--gold)',false)}${(+g.ibv||wi)?bar('本週 IBV',wi,+g.ibv||0,'var(--blue)',false):''}<div style="font-size:.62rem;color:var(--muted);margin-top:2px">本週 ${ws.length} 筆${(+g.bv||+g.ibv||+g.income)?'':' · 到「設定」訂每週目標可拿達標獎勵'}</div></div>`;
+  el.innerHTML=monthHtml+`<div class="card" style="margin-bottom:6px">${bar('本週總賺取',wp,+g.income||0,'var(--green2)',true)}${bar('本週 BV',wb,+g.bv||0,'var(--gold)',false)}${(+g.ibv||wcb)?bar('本週現金回饋',wcb,+g.ibv||0,'var(--blue)',true):''}<div style="font-size:.62rem;color:var(--muted);margin-top:2px">本週 ${ws.length} 筆${(+g.bv||+g.ibv||+g.income)?'':' · 到「設定」訂每週目標可拿達標獎勵'}</div></div>`;
 }
 let careSel=[7,14,30];
 function addDays(dstr,n){const d=new Date(dstr+'T00:00:00');d.setDate(d.getDate()+n);return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
@@ -910,73 +936,101 @@ function careDatesOf(s){if(Array.isArray(s.careDates)&&s.careDates.length)return
 // 取得所有待關懷項目（未來或已過期、且未標記完成）
 function pendingCares(){const out=[];const todayK=dk();retail().sales.forEach(s=>{const done=s.careDone||{};careDatesOf(s).forEach((cd,i)=>{if(done[i])return;out.push({sid:s.id,idx:i,date:cd,item:s.item,customer:s.customer||'',overdue:cd<todayK,today:cd===todayK});});});return out.sort((a,b)=>a.date.localeCompare(b.date));}
 async function markCareDone(sid,idx){const s=retail().sales.find(x=>x.id===sid);if(!s)return;if(!s.careDone)s.careDone={};s.careDone[idx]=true;await saveUser();renderStats();toast('✓ 已完成關懷','tg');}
+let saleSType='bv';
+function setSType(t){saleSType=t;document.querySelectorAll('#stype-chips .stype-chip').forEach(c=>c.classList.toggle('on',c.dataset.t===t));document.querySelector('.stype-bv').style.display=t==='bv'?'block':'none';document.querySelector('.stype-ibv').style.display=t==='ibv'?'block':'none';document.getElementById('s-earn-label').textContent=t==='bv'?'零售利潤（成交價−成本）':'現金回饋（成交價×回饋%×件數）';calcEarn();}
 function openSale(sid){
   editSid=sid||null;
-  const r=retail();let s={item:'',price:'',cost:'',bv:'',ibv:'',customer:'',date:dk(),careDays:[7,14,30]};
+  const r=retail();let s={type:'bv',item:'',price:'',cost:'',bv:'',rate:'',qty:1,customer:'',date:dk(),careDays:[7,14,30]};
   if(sid){const f=r.sales.find(x=>x.id===sid);if(f)s={...f};}
+  const t=saleType(s);
   document.getElementById('sale-title').textContent=sid?'編輯銷售':'記錄銷售';
   document.getElementById('s-item').value=s.item||'';
   document.getElementById('s-price').value=s.price??'';
   document.getElementById('s-cost').value=s.cost??'';
   document.getElementById('s-bv').value=s.bv??'';
-  document.getElementById('s-ibv').value=s.ibv??'';
+  document.getElementById('si-price').value=s.price??'';
+  document.getElementById('si-rate').value=s.rate??'';
+  document.getElementById('si-qty').value=s.qty??1;
   document.getElementById('s-cust').value=s.customer||'';
   document.getElementById('s-date').value=s.date||dk();
   careSel=Array.isArray(s.careDays)?s.careDays.slice():(s.careDate?[]:[7,14,30]);
   document.querySelectorAll('#care-chips .care-chip').forEach(c=>c.classList.toggle('on',careSel.includes(+c.dataset.d)));
   renderCarePreview();
   document.getElementById('s-del').style.display=sid?'block':'none';
-  calcProfit();om('sale-modal');
+  // 編輯舊資料時鎖定類型切換（舊資料維持原樣，不讓改類型避免資料混亂）
+  setSType(t);
+  calcEarn();om('sale-modal');
   if(!sid)setTimeout(()=>document.getElementById('s-item').focus(),350);
 }
-function calcProfit(){const p=+document.getElementById('s-price').value||0,c=+document.getElementById('s-cost').value||0,el=document.getElementById('s-profit');el.textContent='$'+fmtMoney(p-c);el.style.color=(p-c)>=0?'var(--green2)':'var(--red)';}
+function calcEarn(){
+  const el=document.getElementById('s-profit');if(!el)return;
+  let v=0;
+  if(saleSType==='ibv'){const p=+document.getElementById('si-price').value||0,rt=+document.getElementById('si-rate').value||0,q=+document.getElementById('si-qty').value||1;v=Math.round(p*rt/100*q);}
+  else{const p=+document.getElementById('s-price').value||0,c=+document.getElementById('s-cost').value||0;v=p-c;}
+  el.textContent='$'+fmtMoney(v);el.style.color=v>=0?'var(--green2)':'var(--red)';
+}
 async function saveSale(){
   const item=document.getElementById('s-item').value.trim();
-  const pv=document.getElementById('s-price').value,cv=document.getElementById('s-cost').value,bvv=document.getElementById('s-bv').value;
-  if(!item){toast('請輸入品項','tr');return;}
-  if(pv===''||isNaN(+pv)){toast('請輸入成交價','tr');return;}
-  if(cv===''||isNaN(+cv)){toast('請輸入成本','tr');return;}
-  if(bvv===''||isNaN(+bvv)||+bvv<0){toast('請輸入 BV 分數','tr');return;}
-  const price=+pv,cost=+cv,bv=+bvv;
-  const ibv=document.getElementById('s-ibv').value===''?0:+document.getElementById('s-ibv').value;
+  if(!item){toast('請輸入商品名稱','tr');return;}
   const customer=document.getElementById('s-cust').value.trim();
   const date=document.getElementById('s-date').value||dk();
   const careDays=careSel.slice().sort((a,b)=>a-b);
   const careDates=careDays.map(d=>addDays(date,d));
   const r=retail();
+  let rec,newXP,earnTxt;
+  if(saleSType==='ibv'){
+    const pv=document.getElementById('si-price').value,rtv=document.getElementById('si-rate').value,qv=document.getElementById('si-qty').value;
+    if(pv===''||isNaN(+pv)){toast('請輸入成交價','tr');return;}
+    if(rtv===''||isNaN(+rtv)||+rtv<0){toast('請輸入現金回饋 %','tr');return;}
+    const qty=Math.max(1,Math.floor(+qv||1));
+    const price=+pv,rate=+rtv;
+    const cashback=Math.round(price*rate/100*qty),xp=qty*5;
+    rec={type:'ibv',item,price,rate,qty,customer,date,careDays,careDates};
+    newXP=xp;earnTxt=`回饋 $${fmtMoney(cashback)}`;
+  }else{
+    const pv=document.getElementById('s-price').value,cv=document.getElementById('s-cost').value,bvv=document.getElementById('s-bv').value;
+    if(pv===''||isNaN(+pv)){toast('請輸入成交價','tr');return;}
+    if(cv===''||isNaN(+cv)){toast('請輸入成本','tr');return;}
+    if(bvv===''||isNaN(+bvv)||+bvv<0){toast('請輸入 BV 分數','tr');return;}
+    const price=+pv,cost=+cv,bv=+bvv;
+    rec={type:'bv',item,price,cost,bv,customer,date,careDays,careDates};
+    newXP=bv;earnTxt=`利潤 $${fmtMoney(price-cost)}`;
+  }
   if(editSid){
     const s=r.sales.find(x=>x.id===editSid);if(!s)return;
-    const oldBV=+s.bv||0;
-    Object.assign(s,{item,price,cost,bv,ibv,customer,date,careDays,careDates});
-    delete s.careDate;
-    CU.xp=Math.max(0,(CU.xp||0)+(bv-oldBV));
+    const oldXP=(saleType(s)==='ibv'?(+s.qty||1)*5:(+s.bv||0));
+    // 清掉另一類型殘留欄位，避免混雜
+    ['cost','bv','rate','qty'].forEach(k=>delete s[k]);delete s.careDate;delete s.ibv;
+    Object.assign(s,rec);
+    CU.xp=Math.max(0,(CU.xp||0)+(newXP-oldXP));
     toast('✓ 銷售已更新','tg');
   }else{
-    r.sales.push({id:uid(),item,price,cost,bv,ibv,customer,date,careDays,careDates,careDone:{},ts:Date.now()});
-    CU.xp=(CU.xp||0)+bv;
-    addTL('💰',`賣出 ${item}，利潤 $${fmtMoney(price-cost)}`);
-    toast(`✓ 已記錄銷售 +${bv}XP`,'tg');snd('check');
+    r.sales.push({id:uid(),...rec,careDone:{},ts:Date.now()});
+    CU.xp=(CU.xp||0)+newXP;
+    addTL('💰',`賣出 ${item}，${earnTxt}`);
+    toast(`✓ 已記錄銷售 +${newXP}XP`,'tg');snd('check');
   }
   checkWeekGoal();checkMonthGoal();
   await saveUser();await chkLvUp();
   cm('sale-modal');renderHome();
   if(document.getElementById('page-stats').classList.contains('active'))renderStats();
 }
-function delSaleCf(){showCf('刪除銷售','確定刪除這筆銷售嗎？對應的 BV XP 會一併扣除。',async()=>{
+function delSaleCf(){showCf('刪除銷售','確定刪除這筆銷售嗎？對應的 XP 會一併扣除。',async()=>{
   const r=retail(),s=r.sales.find(x=>x.id===editSid);
-  if(s)CU.xp=Math.max(0,(CU.xp||0)-(+s.bv||0));
+  if(s){const xp=saleType(s)==='ibv'?(+s.qty||1)*5:(+s.bv||0);CU.xp=Math.max(0,(CU.xp||0)-xp);}
   r.sales=r.sales.filter(x=>x.id!==editSid);
   await saveUser();cm('sale-modal');renderHome();
   if(document.getElementById('page-stats').classList.contains('active'))renderStats();
   toast('已刪除','tg');
 });}
+function ibvMetric(a){return sumCashback(a)+sumIBV(a);}// IBV 目標口徑：新制現金回饋金 +（舊資料的 IBV 分數，過渡相容）
 function checkWeekGoal(){
   const r=retail(),g=r.weeklyGoal||{},tBV=+g.bv||0,tIBV=+g.ibv||0,tInc=+g.income||0;
   if(!tBV&&!tIBV&&!tInc)return;
   const wk=mondayOf(new Date());
   if(r.bonusWeeks[wk])return;
   const ws=weekSales();
-  if((!tBV||sumBV(ws)>=tBV)&&(!tIBV||sumIBV(ws)>=tIBV)&&(!tInc||sumProfit(ws)>=tInc)){
+  if((!tBV||sumBV(ws)>=tBV)&&(!tIBV||ibvMetric(ws)>=tIBV)&&(!tInc||sumProfit(ws)>=tInc)){
     r.bonusWeeks[wk]=true;CU.xp=(CU.xp||0)+50;
     addTL('🏅','本週零售目標達成！+50XP');
     setTimeout(()=>{toast('🏅 本週零售目標達成 +50XP','to');snd('complete');},700);
@@ -990,13 +1044,13 @@ function checkMonthGoal(){
   const ym=curYM();
   if(r.bonusMonths[ym])return;
   const ms=monthSales();
-  if((!tBV||sumBV(ms)>=tBV)&&(!tIBV||sumIBV(ms)>=tIBV)&&(!tInc||sumProfit(ms)>=tInc)){
+  if((!tBV||sumBV(ms)>=tBV)&&(!tIBV||ibvMetric(ms)>=tIBV)&&(!tInc||sumProfit(ms)>=tInc)){
     r.bonusMonths[ym]=true;CU.xp=(CU.xp||0)+150;
     addTL('🏆',`${ymLabel(ym)}月目標達成！+150XP`);
     setTimeout(()=>{toast('🏆 本月目標達成 +150XP！','to');snd('complete');},900);
   }
 }
-function openGoal(){const g=retail().weeklyGoal||{};document.getElementById('g-bv').value=g.bv||'';document.getElementById('g-ibv').value=g.ibv||'';document.getElementById('g-income').value=g.income||'';const mh=document.getElementById('goal-month-hint');const mg=activeMonthGoal();if(mh){if(mg&&(+mg.bv||+mg.ibv||+mg.income)){const parts=[];if(+mg.bv)parts.push(`BV ${mg.bv}`);if(+mg.ibv)parts.push(`IBV ${mg.ibv}`);if(+mg.income)parts.push(`利潤 $${fmtMoney(mg.income)}`);const wkInM=Math.ceil(new Date(new Date().getFullYear(),new Date().getMonth()+1,0).getDate()/7);mh.innerHTML=`<div style="background:var(--purple-dim);border:1px solid rgba(176,110,255,.25);border-radius:var(--r-sm);padding:10px 12px;margin-bottom:12px;font-size:.7rem;line-height:1.7"><div style="color:var(--purple2);font-weight:700;margin-bottom:3px">📅 ${ymLabel(mg.ym)}月目標（${mg.setBy?esc(mg.setBy)+' 指定':'已指定'}）</div><div style="color:var(--muted2)">${parts.join('・')}</div><div style="color:var(--muted);margin-top:4px">本月約 ${wkInM} 週，自己拆成每週目標，週週達標也累積月成績 💪</div></div>`;}else{mh.innerHTML='';}}om('goal-modal');}
+function openGoal(){const g=retail().weeklyGoal||{};document.getElementById('g-bv').value=g.bv||'';document.getElementById('g-ibv').value=g.ibv||'';document.getElementById('g-income').value=g.income||'';const mh=document.getElementById('goal-month-hint');const mg=activeMonthGoal();if(mh){if(mg&&(+mg.bv||+mg.ibv||+mg.income)){const parts=[];if(+mg.bv)parts.push(`BV ${mg.bv}`);if(+mg.ibv)parts.push(`回饋 $${fmtMoney(mg.ibv)}`);if(+mg.income)parts.push(`總賺取 $${fmtMoney(mg.income)}`);const wkInM=Math.ceil(new Date(new Date().getFullYear(),new Date().getMonth()+1,0).getDate()/7);mh.innerHTML=`<div style="background:var(--purple-dim);border:1px solid rgba(176,110,255,.25);border-radius:var(--r-sm);padding:10px 12px;margin-bottom:12px;font-size:.7rem;line-height:1.7"><div style="color:var(--purple2);font-weight:700;margin-bottom:3px">📅 ${ymLabel(mg.ym)}月目標（${mg.setBy?esc(mg.setBy)+' 指定':'已指定'}）</div><div style="color:var(--muted2)">${parts.join('・')}</div><div style="color:var(--muted);margin-top:4px">本月約 ${wkInM} 週，自己拆成每週目標，週週達標也累積月成績 💪</div></div>`;}else{mh.innerHTML='';}}om('goal-modal');}
 async function saveGoal(){const r=retail();r.weeklyGoal={bv:+document.getElementById('g-bv').value||0,ibv:+document.getElementById('g-ibv').value||0,income:+document.getElementById('g-income').value||0};checkWeekGoal();checkMonthGoal();await saveUser();cm('goal-modal');renderSet();renderRetail();toast('週目標已更新','tg');}
 let ledgerMode='week';
 function setLedger(m){ledgerMode=m;['week','month','all'].forEach(x=>{const t=document.getElementById('lgt-'+x);if(t)t.classList.toggle('active',x===m);});renderLedger();}
@@ -1020,10 +1074,10 @@ function renderLedger(){
   const sEl=document.getElementById('ledger-sum'),lEl=document.getElementById('ledger-list');if(!sEl)return;
   const allSorted=[...retail().sales].sort((a,b)=>(b.date||'').localeCompare(a.date||'')||((b.ts||0)-(a.ts||0)));
   const list=ledgerFilter(allSorted);
-  const tp=sumProfit(list),tb=sumBV(list),ti=sumIBV(list);
+  const total=sumProfit(list),bvP=sumBVProfit(list),cb=sumCashback(list),tb=sumBV(list);
   const lbl=ledgerMode==='week'?'本週':ledgerMode==='month'?'本月':'全部';
-  sEl.innerHTML=`<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;text-align:center"><div><div style="font-family:var(--orb);font-size:1rem;color:var(--green2)">$${fmtMoney(tp)}</div><div style="font-size:.54rem;color:var(--muted2)">${lbl}利潤</div></div><div><div style="font-family:var(--orb);font-size:1rem;color:var(--gold)">${fmtMoney(tb)}</div><div style="font-size:.54rem;color:var(--muted2)">${lbl} BV</div></div><div><div style="font-family:var(--orb);font-size:1rem;color:var(--blue)">${fmtMoney(ti)}</div><div style="font-size:.54rem;color:var(--muted2)">${lbl} IBV</div></div><div><div style="font-family:var(--orb);font-size:1rem;color:var(--purple2)">${list.length}</div><div style="font-size:.54rem;color:var(--muted2)">筆數</div></div></div>`;
-  lEl.innerHTML=list.slice(0,30).map(s=>`<div class="ai"><div class="ab"><div class="an">💰 ${esc(s.item)}${s.customer?` <span style="font-size:.64rem;color:var(--muted2)">→ ${esc(s.customer)}</span>`:''}</div><div class="ano">${esc(s.date||'')} · BV ${+s.bv||0}${+s.ibv?` · IBV ${+s.ibv}`:''}${careDatesOf(s).length?` · 🔔 ${careDatesOf(s).length} 次關懷`:''}</div></div><div class="axp" style="color:${profitOf(s)>=0?'var(--green2)':'var(--red)'};background:var(--green-dim);border-color:rgba(34,211,122,.15)">$${fmtMoney(profitOf(s))}</div><button class="aed" onclick="openSale('${s.id}')">編輯</button></div>`).join('')||`<div class="card" style="text-align:center;color:var(--muted);font-size:.82rem;padding:18px">${ledgerMode==='all'?'尚無銷售記錄，到「今日」頁記下第一筆吧！':'這個期間還沒有銷售記錄'}</div>`;
+  sEl.innerHTML=`<div style="text-align:center;padding-bottom:10px;margin-bottom:10px;border-bottom:1px solid var(--border)"><div style="font-family:var(--orb);font-size:1.6rem;color:var(--green2)">$${fmtMoney(total)}</div><div style="font-size:.6rem;color:var(--muted2)">${lbl}總賺取（BV利潤＋IBV回饋）</div></div><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;text-align:center"><div><div style="font-family:var(--orb);font-size:.92rem;color:var(--gold)">$${fmtMoney(bvP)}</div><div style="font-size:.52rem;color:var(--muted2)">BV利潤</div></div><div><div style="font-family:var(--orb);font-size:.92rem;color:var(--blue)">$${fmtMoney(cb)}</div><div style="font-size:.52rem;color:var(--muted2)">IBV回饋</div></div><div><div style="font-family:var(--orb);font-size:.92rem;color:var(--purple2)">${fmtMoney(tb)}</div><div style="font-size:.52rem;color:var(--muted2)">BV分數</div></div><div><div style="font-family:var(--orb);font-size:.92rem;color:var(--text)">${list.length}</div><div style="font-size:.52rem;color:var(--muted2)">筆數</div></div></div>`;
+  lEl.innerHTML=list.slice(0,30).map(s=>{const isIbv=saleType(s)==='ibv';const tag=isIbv?'💵':'📦';let meta;if(isIbv){meta=`${esc(s.date||'')} · 回饋${+s.rate||0}%${(+s.qty>1)?` ×${s.qty}件`:''}`;}else{meta=`${esc(s.date||'')} · BV ${+s.bv||0}${+s.ibv?` · IBV ${+s.ibv}`:''}`;}return`<div class="ai"><div class="ab"><div class="an">${tag} ${esc(s.item)}${s.customer?` <span style="font-size:.64rem;color:var(--muted2)">→ ${esc(s.customer)}</span>`:''}</div><div class="ano">${meta}${careDatesOf(s).length?` · 🔔 ${careDatesOf(s).length} 次關懷`:''}</div></div><div class="axp" style="color:${earnOf(s)>=0?'var(--green2)':'var(--red)'};background:var(--green-dim);border-color:rgba(34,211,122,.15)">$${fmtMoney(earnOf(s))}</div><button class="aed" onclick="openSale('${s.id}')">編輯</button></div>`;}).join('')||`<div class="card" style="text-align:center;color:var(--muted);font-size:.82rem;padding:18px">${ledgerMode==='all'?'尚無銷售記錄，到「今日」頁記下第一筆吧！':'這個期間還沒有銷售記錄'}</div>`;
 }
 /* COPY REPORT */
 function openCopy(){document.getElementById('copy-rec').value=retail().recommend||'';buildCopy();om('copy-modal');}
@@ -1130,7 +1184,7 @@ function calcMS(m){let s=0;const d=new Date();for(let i=0;i<365;i++){const k=`${
 function m3d(v,t,l){const cls=v>=t?'full':v>0?'part':'';return`<div class="m3d ${cls}"><div class="m3v">${v}/${t}</div><div class="m3k">${l}</div></div>`;}
 function cheer(e,name){e.stopPropagation();toast(`💪 為 ${name} 打氣！加油衝！`,'tp');snd('check');}
 /* SETTINGS */
-function renderSet(){if(!CU)return;const ch=CHARS[CU.charId]||CHARS.resonator;document.getElementById('sr-icon').innerHTML=charEmblem(CU.charId,34,false);document.getElementById('sr-name').textContent=`${CU.name}（${CU.username}）`;document.getElementById('sr-sub').textContent=`${CU.region} · 大C：${CU.leader}${CU.subLeader?` · 小C：${CU.subLeader}`:''} · Lv.${CU.level||1} · ${CU.xp||0} XP`;const g=(CU.retail&&CU.retail.weeklyGoal)||{};const gs=document.getElementById('goal-sub');if(gs){const parts=[];if(+g.bv)parts.push(`BV ${g.bv}`);if(+g.ibv)parts.push(`IBV ${g.ibv}`);if(+g.income)parts.push(`利潤 $${fmtMoney(g.income)}`);gs.textContent=parts.length?'每週 '+parts.join(' · '):'尚未設定，點擊設定（達標 +50XP）';}const se=document.getElementById('subadmin-entry');if(se){const isSub=CU.role==='subadmin'&&CU.managedSubC;se.style.display=isSub?'flex':'none';if(isSub)document.getElementById('subadmin-sub').textContent=`管理小C：${CU.managedSubC}`;}const ms=document.getElementById('mysubc-sub');if(ms)ms.textContent=CU.subLeader?`目前：${CU.subLeader}`:'尚未設定，點擊選擇';}
+function renderSet(){if(!CU)return;const ch=CHARS[CU.charId]||CHARS.resonator;document.getElementById('sr-icon').innerHTML=charEmblem(CU.charId,34,false);document.getElementById('sr-name').textContent=`${CU.name}（${CU.username}）`;document.getElementById('sr-sub').textContent=`${CU.region} · 大C：${CU.leader}${CU.subLeader?` · 小C：${CU.subLeader}`:''} · Lv.${CU.level||1} · ${CU.xp||0} XP`;const g=(CU.retail&&CU.retail.weeklyGoal)||{};const gs=document.getElementById('goal-sub');if(gs){const parts=[];if(+g.bv)parts.push(`BV ${g.bv}`);if(+g.ibv)parts.push(`回饋 $${fmtMoney(g.ibv)}`);if(+g.income)parts.push(`總賺取 $${fmtMoney(g.income)}`);gs.textContent=parts.length?'每週 '+parts.join(' · '):'尚未設定，點擊設定（達標 +50XP）';}const se=document.getElementById('subadmin-entry');if(se){const isSub=CU.role==='subadmin'&&CU.managedSubC;se.style.display=isSub?'flex':'none';if(isSub)document.getElementById('subadmin-sub').textContent=`管理小C：${CU.managedSubC}`;}const ms=document.getElementById('mysubc-sub');if(ms)ms.textContent=CU.subLeader?`目前：${CU.subLeader}`:'尚未設定，點擊選擇';}
 function openChangeName(){document.getElementById('new-name').value=CU.name||'';om('name-modal');setTimeout(()=>document.getElementById('new-name').focus(),350);}
 function openMySubC(){document.getElementById('my-subc').value=CU.subLeader||'';om('subc-modal');setTimeout(()=>document.getElementById('my-subc').focus(),350);}
 async function saveMySubC(){const v=document.getElementById('my-subc').value.trim();CU.subLeader=v;
@@ -1270,17 +1324,17 @@ let ledUser=null;
 function openLedgerModal(username){
   const u=(window._abl?Object.values(window._abl).flat():[]).find(x=>x.username===username);if(!u)return;
   ledUser=u;
-  const sales=uSales(u),tp=sumProfit(sales),tb=sumBV(sales),ti=sumIBV(sales);
+  const sales=uSales(u),total=sumProfit(sales),bvP=sumBVProfit(sales),cb=sumCashback(sales),tb=sumBV(sales);
   document.getElementById('led-title').textContent=`📒 ${u.name} 的帳本`;
   const sorted=[...sales].sort((a,b)=>(b.date||'').localeCompare(a.date||''));
-  document.getElementById('led-body').innerHTML=`<div class="card" style="margin-bottom:10px"><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;text-align:center"><div><div style="font-family:var(--orb);font-size:1rem;color:var(--green2)">$${fmtMoney(tp)}</div><div style="font-size:.54rem;color:var(--muted2)">累積利潤</div></div><div><div style="font-family:var(--orb);font-size:1rem;color:var(--gold)">${fmtMoney(tb)}</div><div style="font-size:.54rem;color:var(--muted2)">累積 BV</div></div><div><div style="font-family:var(--orb);font-size:1rem;color:var(--blue)">${fmtMoney(ti)}</div><div style="font-size:.54rem;color:var(--muted2)">累積 IBV</div></div><div><div style="font-family:var(--orb);font-size:1rem;color:var(--purple2)">${sales.length}</div><div style="font-size:.54rem;color:var(--muted2)">筆數</div></div></div></div>`+
-  (sorted.length?sorted.slice(0,50).map(s=>`<div class="ai"><div class="ab"><div class="an">💰 ${esc(s.item)}</div><div class="ano">${esc(s.date||'')} · 成交$${fmtMoney(s.price)} · 成本$${fmtMoney(s.cost)} · BV ${+s.bv||0}${+s.ibv?` · IBV ${+s.ibv}`:''}</div></div><div class="axp" style="color:var(--green2);background:var(--green-dim);border-color:rgba(34,211,122,.15)">$${fmtMoney(profitOf(s))}</div></div>`).join(''):'<div style="text-align:center;color:var(--muted);font-size:.82rem;padding:18px">此店主尚無銷售記錄</div>');
+  document.getElementById('led-body').innerHTML=`<div class="card" style="margin-bottom:10px"><div style="text-align:center;padding-bottom:10px;margin-bottom:10px;border-bottom:1px solid var(--border)"><div style="font-family:var(--orb);font-size:1.5rem;color:var(--green2)">$${fmtMoney(total)}</div><div style="font-size:.56rem;color:var(--muted2)">累積總賺取（BV利潤＋IBV回饋）</div></div><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;text-align:center"><div><div style="font-family:var(--orb);font-size:.92rem;color:var(--gold)">$${fmtMoney(bvP)}</div><div style="font-size:.52rem;color:var(--muted2)">BV利潤</div></div><div><div style="font-family:var(--orb);font-size:.92rem;color:var(--blue)">$${fmtMoney(cb)}</div><div style="font-size:.52rem;color:var(--muted2)">IBV回饋</div></div><div><div style="font-family:var(--orb);font-size:.92rem;color:var(--purple2)">${fmtMoney(tb)}</div><div style="font-size:.52rem;color:var(--muted2)">BV分數</div></div><div><div style="font-family:var(--orb);font-size:.92rem;color:var(--text)">${sales.length}</div><div style="font-size:.52rem;color:var(--muted2)">筆數</div></div></div></div>`+
+  (sorted.length?sorted.slice(0,50).map(s=>{const isIbv=saleType(s)==='ibv';let meta;if(isIbv){meta=`${esc(s.date||'')} · 成交$${fmtMoney(s.price)} · 回饋${+s.rate||0}%${(+s.qty>1)?`×${s.qty}件`:''}`;}else{meta=`${esc(s.date||'')} · 成交$${fmtMoney(s.price)} · 成本$${fmtMoney(s.cost)} · BV ${+s.bv||0}`;}return`<div class="ai"><div class="ab"><div class="an">${isIbv?'💵':'📦'} ${esc(s.item)}</div><div class="ano">${meta}</div></div><div class="axp" style="color:var(--green2);background:var(--green-dim);border-color:rgba(34,211,122,.15)">$${fmtMoney(earnOf(s))}</div></div>`;}).join(''):'<div style="text-align:center;color:var(--muted);font-size:.82rem;padding:18px">此店主尚無銷售記錄</div>');
   om('led-modal');
 }
 function csvEscape(v){const s=String(v??'');return /[",\n]/.test(s)?`"${s.replace(/"/g,'""')}"`:s;}
-function salesToCsv(rows){const head=['店主','店主帳號','地區','大C','品項','售出日期','成交價','成本','零售利潤','BV','IBV'];const lines=[head.join(',')];rows.forEach(r=>lines.push(r.map(csvEscape).join(',')));return'\ufeff'+lines.join('\n');}// BOM for Excel 中文
+function salesToCsv(rows){const head=['店主','店主帳號','地區','大C','小C','類型','品項','售出日期','成交價','成本','回饋%','件數','BV分數','賺取金額'];const lines=[head.join(',')];rows.forEach(r=>lines.push(r.map(csvEscape).join(',')));return'\ufeff'+lines.join('\n');}// BOM for Excel 中文
 function dlCsv(csv,fname){const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=fname;a.click();URL.revokeObjectURL(url);}
-function userSaleRows(u){return uSales(u).map(s=>[u.name,u.username,u.region||'',u.leader||'',s.item,s.date||'',s.price,s.cost,profitOf(s),+s.bv||0,+s.ibv||0]);}
+function userSaleRows(u){return uSales(u).map(s=>{const isIbv=saleType(s)==='ibv';return[u.name,u.username,u.region||'',u.leader||'',u.subLeader||'',isIbv?'IBV':'BV',s.item,s.date||'',s.price,isIbv?'':s.cost,isIbv?(+s.rate||0):'',isIbv?(+s.qty||1):'',isIbv?'':(+s.bv||0),earnOf(s)];});}
 function exportOneCsv(){if(!ledUser)return;const rows=userSaleRows(ledUser);if(!rows.length){toast('此店主沒有銷售記錄','to');return;}dlCsv(salesToCsv(rows),`帳本-${ledUser.name}-${dk()}.csv`);toast('已下載 CSV','tg');}
 function exportAllCsv(){const all=window._abl?Object.values(window._abl).flat():[];const rows=[];all.forEach(u=>rows.push(...userSaleRows(u)));if(!rows.length){toast('目前沒有任何銷售記錄','to');return;}const fn=SUBADMIN_MODE?`小C-${CU.managedSubC}-銷售總表-${dk()}.csv`:`全團隊銷售總表-${dk()}.csv`;dlCsv(salesToCsv(rows),fn);toast(`已下載 ${rows.length} 筆銷售`,'tg');}
 function renderSalesSummary(){
@@ -1290,7 +1344,7 @@ function renderSalesSummary(){
   const el=document.getElementById('sales-summary');if(!el)return;
   if(!rank.length){el.innerHTML='<div style="color:var(--muted);font-size:.82rem;padding:14px;text-align:center">尚無銷售資料</div>';return;}
   const RE=['🥇','🥈','🥉'];
-  el.innerHTML=`<div class="card" style="margin-bottom:10px"><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;text-align:center"><div><div style="font-family:var(--orb);font-size:1.2rem;color:var(--green2)">$${fmtMoney(totalProf)}</div><div style="font-size:.56rem;color:var(--muted2)">團隊總利潤</div></div><div><div style="font-family:var(--orb);font-size:1.2rem;color:var(--purple2)">${totalCnt}</div><div style="font-size:.56rem;color:var(--muted2)">總銷售筆數</div></div></div></div>`+
+  el.innerHTML=`<div class="card" style="margin-bottom:10px"><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;text-align:center"><div><div style="font-family:var(--orb);font-size:1.2rem;color:var(--green2)">$${fmtMoney(totalProf)}</div><div style="font-size:.56rem;color:var(--muted2)">團隊總賺取</div></div><div><div style="font-family:var(--orb);font-size:1.2rem;color:var(--purple2)">${totalCnt}</div><div style="font-size:.56rem;color:var(--muted2)">總銷售筆數</div></div></div></div>`+
   rank.slice(0,20).map((x,i)=>`<div class="lbi"><div class="lbr" style="color:${i===0?'#ffd700':i===1?'#c0c0c0':i===2?'#cd7f32':'var(--muted)'}">${i<3?RE[i]:i+1}</div><div class="lbii" style="margin-left:8px"><div class="lbn">${esc(x.name)} <span style="font-size:.58rem;color:var(--muted2)">${esc(x.region)}</span></div><div class="lbs">BV ${fmtMoney(x.bv)} · ${x.cnt} 筆</div></div><div class="lbx" style="color:var(--green2)">$${fmtMoney(x.prof)}</div></div>`).join('');
 }
 /* PAGE/SCREEN */
